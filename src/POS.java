@@ -14,8 +14,6 @@ import javax.swing.JLabel;
 
 import java.awt.Font;
 import java.io.IOException;
-import java.awt.FlowLayout;
-
 import javax.swing.JButton;
 import javax.swing.BoxLayout;
 import javax.swing.JFormattedTextField;
@@ -29,12 +27,19 @@ import java.awt.event.ActionEvent;
 import javax.swing.JTextArea;
 import javax.swing.JScrollPane;
 import java.awt.CardLayout;
+import javax.swing.JTextField;
+import java.awt.GridBagLayout;
+import java.awt.GridBagConstraints;
+import java.awt.Insets;
+import javax.swing.JList;
+import javax.swing.ListSelectionModel;
+import javax.swing.AbstractListModel;
+import javax.swing.ScrollPaneConstants;
 
 
-public class POS {
+public class POS extends JPanel{
 
 	private JFrame frmDominosPizzaPoint;
-
 	/**
 	 * Launch the application.
 	 */
@@ -63,7 +68,10 @@ public class POS {
 	 */
 	public void initialize() {
 		final String LOGINCARD = "Login";
-		final String SYSTEMCARD = "System";
+		final String SYSCARD = "System";
+		final String POSCARD = "POS";
+		final String CONFIGCARD = "Config";
+		final String ADMINCARD = "Admin";
 		Color Pink = new Color(251, 200, 202);
 		Color Blue = new Color(0, 78, 150);
 		Image image = null;
@@ -83,10 +91,10 @@ public class POS {
 		Dimension dimPIN = new Dimension(200, 45);
 		Dimension dimLogin = new Dimension(150, 50);
 		Dimension dimNav = new Dimension(186, 40);
-		Dimension dimLogoutPad = new Dimension(15, 0);
 		Dimension dimReceipt = new Dimension(391, 0);
 		Dimension dimOrder = new Dimension(154, 50);
 		Dimension dimItem = new Dimension(530, 100);
+		Dimension dimAction = new Dimension(150, 30);
 		
 		frmDominosPizzaPoint = new JFrame();
 		frmDominosPizzaPoint.setBackground(Pink);
@@ -97,10 +105,10 @@ public class POS {
 		frmDominosPizzaPoint.pack();  
 		frmDominosPizzaPoint.setLocationRelativeTo(null); 
 		frmDominosPizzaPoint.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		CardLayout metaHand = new CardLayout();
+		final CardLayout metaHand = new CardLayout();
 		frmDominosPizzaPoint.getContentPane().setLayout(metaHand);
 		
-		JPanel loginCard = new JPanel();
+		final JPanel loginCard = new JPanel();
 		loginCard.setBackground(Pink);
 		frmDominosPizzaPoint.getContentPane().add(loginCard, LOGINCARD);
 		BorderLayout divLayout = new BorderLayout(0, 0);
@@ -167,13 +175,20 @@ public class POS {
 		btnLogOn.setPreferredSize(dimLogin);
 		loginPanel.add(btnLogOn);
 		
+		btnLogOn.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				metaHand.next(frmDominosPizzaPoint.getContentPane());
+			}
+		});
+		
 		loginPanel.add(Box.createVerticalGlue());
 		
 //		END LOGIN PANEL CODE	//
 		
 		JPanel systemCard = new JPanel();
 		systemCard.setBackground(Pink);
-		frmDominosPizzaPoint.getContentPane().add(systemCard, SYSTEMCARD);
+		frmDominosPizzaPoint.getContentPane().add(systemCard, SYSCARD);
 		BorderLayout divBorder = new BorderLayout(0, 0);
 		systemCard.setLayout(divBorder);
 		
@@ -192,19 +207,19 @@ public class POS {
 		lblDominosIcon1.setIcon(icon);
 		headerNav.add(lblDominosIcon1);
 		
-		JButton btnPOS = new JButton("Point of Sales");
+		final JButton btnPOS = new JButton("Point of Sales");
 		btnPOS.setSize(dimNav);
 		btnPOS.setPreferredSize(dimNav);
 		btnPOS.setMinimumSize(dimNav);
 		btnPOS.setMaximumSize(dimNav);
 		
-		JButton btnPrice = new JButton("Price & Rate Configuration");
+		final JButton btnPrice = new JButton("Price & Rate Configuration");
 		btnPrice.setSize(dimNav);
 		btnPrice.setPreferredSize(dimNav);
 		btnPrice.setMinimumSize(dimNav);
 		btnPrice.setMaximumSize(dimNav);
 		
-		JButton btnAdmin = new JButton("Account Administration");
+		final JButton btnAdmin = new JButton("Account Administration");
 		btnAdmin.setSize(dimNav);
 		btnAdmin.setPreferredSize(dimNav);
 		btnAdmin.setMinimumSize(dimNav);
@@ -237,16 +252,27 @@ public class POS {
 		btnLogOut.setMaximumSize(dimNav);
 		headerNav.add(btnLogOut);
 		
+		btnLogOut.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				metaHand.previous(frmDominosPizzaPoint.getContentPane());
+			}
+		});
+		
 		headerNav.add(Box.createRigidArea(dimMargin));
 //		END NAV HEADER		//
 		
-		JPanel POSpanel = new JPanel();
-		POSpanel.setBackground(Pink);
-		POSpanel.setPreferredSize(new Dimension(0, 650));
-		systemCard.add(POSpanel, BorderLayout.CENTER);
+		final JPanel subsysPanel = new JPanel();
+		subsysPanel.setBackground(Pink);
+		subsysPanel.setPreferredSize(new Dimension(0, 650));
+		systemCard.add(subsysPanel, BorderLayout.CENTER);
+		final CardLayout subHand = new CardLayout();
+		subsysPanel.setLayout(subHand);
 		
-//		ActionLogin(formattedPIN.getText().trim(), btnLogOn, POSpanel);
-		POSpanel.setLayout(new BorderLayout(0, 0));
+		JPanel POScard = new JPanel();
+		POScard.setBackground(Pink);
+		subsysPanel.add(POScard, POSCARD);
+		POScard.setLayout(new BorderLayout(0, 0));
 		
 //		JScrollPane scrollReceipt = new JScrollPane();
 //		scrollReceipt.setPreferredSize(dimReceipt);
@@ -281,11 +307,11 @@ public class POS {
 		scrollReceipt.setMinimumSize(dimReceipt);
 		scrollReceipt.setMaximumSize(dimReceipt);
 		scrollReceipt.setPreferredSize(dimReceipt);
-		systemCard.add(scrollReceipt, BorderLayout.EAST);
+		POScard.add(scrollReceipt, BorderLayout.EAST);
 		
 		JPanel leftPanel = new JPanel();
 		leftPanel.setBackground(Pink);
-		POSpanel.add(leftPanel, BorderLayout.CENTER);
+		POScard.add(leftPanel, BorderLayout.CENTER);
 		leftPanel.setLayout(new BorderLayout(0, 0));
 		
 		JPanel orderPanel = new JPanel();
@@ -334,7 +360,406 @@ public class POS {
 		btnSoda.setMaximumSize(dimItem);
 		btnSoda.setAlignmentX(Component.CENTER_ALIGNMENT);
 		ItemPanel.add(btnSoda);
+		
+		// BEGIN PRICE & RATE
+		JPanel priceCard = new JPanel();
+		priceCard.setBackground(Pink);
+		subsysPanel.add(priceCard, CONFIGCARD);
+		priceCard.setLayout(new BorderLayout(0, 0));
+		
+		JPanel configAreaPanel = new JPanel();
+		configAreaPanel.setBackground(Pink);
+		priceCard.add(configAreaPanel, BorderLayout.NORTH);
+		configAreaPanel.setLayout(new BoxLayout(configAreaPanel, BoxLayout.Y_AXIS));
+		
+		configAreaPanel.add(Box.createRigidArea(new Dimension(0, 140)));
+		
+		JPanel sodaPanel = new JPanel();
+		sodaPanel.setBackground(Pink);
+		configAreaPanel.add(sodaPanel);
+		sodaPanel.setLayout(new BoxLayout(sodaPanel, BoxLayout.X_AXIS));
+		
+		sodaPanel.add(Box.createRigidArea(new Dimension(22, 0)));
+		
+		JLabel lblSodaPrice = new JLabel("Soda Price");
+		sodaPanel.add(lblSodaPrice);
+		
+		sodaPanel.add(Box.createRigidArea(dimMargin));
+		
+		JTextField textSodaPrice = new JTextField();
+		textSodaPrice.setMaximumSize(new Dimension(100, 20));
+		textSodaPrice.setText("$0.00");
+		sodaPanel.add(textSodaPrice);
+		textSodaPrice.setColumns(5);
+		
+		configAreaPanel.add(Box.createRigidArea(new Dimension(0, 40)));
+		
+		JPanel metaPizzaPanel = new JPanel();
+		metaPizzaPanel.setBackground(Pink);
+		configAreaPanel.add(metaPizzaPanel);
+		
+		// BEGIN REGULAR PIZZA PRICE PANEL
+		JPanel regPizzaPanel = new JPanel();
+		regPizzaPanel.setBackground(Pink);
+		regPizzaPanel.setPreferredSize(new Dimension(225, 130));
+		regPizzaPanel.setMaximumSize(new Dimension(225, 130));
+		metaPizzaPanel.add(regPizzaPanel);
+		GridBagLayout gbl_regPizzaPanel = new GridBagLayout();
+		gbl_regPizzaPanel.columnWidths = new int[]{85, 0, 100, 40};
+		gbl_regPizzaPanel.rowHeights = new int[]{32, 32, 32, 32};
+		gbl_regPizzaPanel.columnWeights = new double[]{Double.MIN_VALUE, 1.0};
+		gbl_regPizzaPanel.rowWeights = new double[]{Double.MIN_VALUE};
+		regPizzaPanel.setLayout(gbl_regPizzaPanel);
+		
+		JLabel lblRegPizza = new JLabel("Regular Pizza Prices");
+		lblRegPizza.setFont(helB18);
+		GridBagConstraints gbc_lblRegPizza = new GridBagConstraints();
+		gbc_lblRegPizza.gridwidth = 4;
+		gbc_lblRegPizza.insets = new Insets(0, 0, 5, 0);
+		gbc_lblRegPizza.gridx = 0;
+		gbc_lblRegPizza.gridy = 0;
+		regPizzaPanel.add(lblRegPizza, gbc_lblRegPizza);
+		
+		JLabel lblRegSmall = new JLabel("Small");
+		GridBagConstraints gbc_lblRegSmall = new GridBagConstraints();
+		gbc_lblRegSmall.anchor = GridBagConstraints.EAST;
+		gbc_lblRegSmall.insets = new Insets(0, 0, 5, 5);
+		gbc_lblRegSmall.gridx = 0;
+		gbc_lblRegSmall.gridy = 1;
+		regPizzaPanel.add(lblRegSmall, gbc_lblRegSmall);
+		
+		JTextField textRegSmall = new JTextField();
+		textRegSmall.setHorizontalAlignment(SwingConstants.RIGHT);
+		textRegSmall.setText("$0.00");
+		GridBagConstraints gbc_textRegSmall = new GridBagConstraints();
+		gbc_textRegSmall.gridwidth = 2;
+		gbc_textRegSmall.insets = new Insets(0, 0, 5, 5);
+		gbc_textRegSmall.fill = GridBagConstraints.HORIZONTAL;
+		gbc_textRegSmall.gridx = 1;
+		gbc_textRegSmall.gridy = 1;
+		regPizzaPanel.add(textRegSmall, gbc_textRegSmall);
+		textRegSmall.setColumns(10);
+		
+		JLabel lblRegMedium = new JLabel("Medium");
+		GridBagConstraints gbc_lblRegMedium = new GridBagConstraints();
+		gbc_lblRegMedium.anchor = GridBagConstraints.EAST;
+		gbc_lblRegMedium.insets = new Insets(0, 0, 5, 5);
+		gbc_lblRegMedium.gridx = 0;
+		gbc_lblRegMedium.gridy = 2;
+		regPizzaPanel.add(lblRegMedium, gbc_lblRegMedium);
+		
+		JTextField textRegMedium = new JTextField();
+		textRegMedium.setHorizontalAlignment(SwingConstants.RIGHT);
+		textRegMedium.setText("$0.00");
+		GridBagConstraints gbc_textRegMedium = new GridBagConstraints();
+		gbc_textRegMedium.gridwidth = 2;
+		gbc_textRegMedium.insets = new Insets(0, 0, 5, 5);
+		gbc_textRegMedium.fill = GridBagConstraints.HORIZONTAL;
+		gbc_textRegMedium.gridx = 1;
+		gbc_textRegMedium.gridy = 2;
+		regPizzaPanel.add(textRegMedium, gbc_textRegMedium);
+		textRegMedium.setColumns(10);
+		
+		JLabel lblRegLarge = new JLabel("Large");
+		GridBagConstraints gbc_lblRegLarge = new GridBagConstraints();
+		gbc_lblRegLarge.anchor = GridBagConstraints.EAST;
+		gbc_lblRegLarge.insets = new Insets(0, 0, 0, 5);
+		gbc_lblRegLarge.gridx = 0;
+		gbc_lblRegLarge.gridy = 3;
+		regPizzaPanel.add(lblRegLarge, gbc_lblRegLarge);
+		
+		JTextField textRegLarge = new JTextField();
+		textRegLarge.setHorizontalAlignment(SwingConstants.RIGHT);
+		textRegLarge.setText("$0.00");
+		GridBagConstraints gbc_textRegLarge = new GridBagConstraints();
+		gbc_textRegLarge.gridwidth = 2;
+		gbc_textRegLarge.insets = new Insets(0, 0, 5, 5);
+		gbc_textRegLarge.fill = GridBagConstraints.HORIZONTAL;
+		gbc_textRegLarge.gridx = 1;
+		gbc_textRegLarge.gridy = 3;
+		regPizzaPanel.add(textRegLarge, gbc_textRegLarge);
+		textRegLarge.setColumns(10);
+		// END REGULAR PIZZA PRICE PANEL
+		
+		// BEGIN SPECIALTY PIZZA PRICE PANEL
+		JPanel specPizzaPanel = new JPanel();
+		specPizzaPanel.setBackground(Pink);
+		specPizzaPanel.setPreferredSize(new Dimension(225, 130));
+		specPizzaPanel.setMaximumSize(new Dimension(225, 130));
+		metaPizzaPanel.add(specPizzaPanel);
+		GridBagLayout gbl_specPizzaPanel = new GridBagLayout();
+		gbl_specPizzaPanel.columnWidths = new int[]{85, 0, 100, 40};
+		gbl_specPizzaPanel.rowHeights = new int[]{32, 32, 32, 32};
+		gbl_specPizzaPanel.columnWeights = new double[]{Double.MIN_VALUE};
+		gbl_specPizzaPanel.rowWeights = new double[]{Double.MIN_VALUE};
+		specPizzaPanel.setLayout(gbl_specPizzaPanel);
+		
+		JLabel lblSpecPizza = new JLabel("Specialty Pizza Prices");
+		lblSpecPizza.setFont(helB18);
+		GridBagConstraints gbc_lblSpecPizza = new GridBagConstraints();
+		gbc_lblSpecPizza.gridwidth = 4;
+		gbc_lblSpecPizza.insets = new Insets(0, 0, 5, 0);
+		gbc_lblSpecPizza.gridx = 0;
+		gbc_lblSpecPizza.gridy = 0;
+		specPizzaPanel.add(lblSpecPizza, gbc_lblSpecPizza);
+		
+		JLabel lblSpecSmall = new JLabel("Small");
+		GridBagConstraints gbc_lblSpecSmall = new GridBagConstraints();
+		gbc_lblSpecSmall.gridwidth = 2;
+		gbc_lblSpecSmall.anchor = GridBagConstraints.EAST;
+		gbc_lblSpecSmall.insets = new Insets(0, 0, 5, 5);
+		gbc_lblSpecSmall.gridx = 0;
+		gbc_lblSpecSmall.gridy = 1;
+		specPizzaPanel.add(lblSpecSmall, gbc_lblSpecSmall);
+		
+		JTextField textSpecSmall = new JTextField();
+		textSpecSmall.setHorizontalAlignment(SwingConstants.RIGHT);
+		textSpecSmall.setText("$0.00");
+		GridBagConstraints gbc_textSpecSmall = new GridBagConstraints();
+		gbc_textSpecSmall.insets = new Insets(0, 0, 5, 5);
+		gbc_textSpecSmall.fill = GridBagConstraints.HORIZONTAL;
+		gbc_textSpecSmall.gridx = 2;
+		gbc_textSpecSmall.gridy = 1;
+		specPizzaPanel.add(textSpecSmall, gbc_textSpecSmall);
+		textSpecSmall.setColumns(10);
+		
+		JLabel lblSpecMedium = new JLabel("Medium");
+		GridBagConstraints gbc_lblSpecMedium = new GridBagConstraints();
+		gbc_lblSpecMedium.gridwidth = 2;
+		gbc_lblSpecMedium.anchor = GridBagConstraints.EAST;
+		gbc_lblSpecMedium.insets = new Insets(0, 0, 5, 5);
+		gbc_lblSpecMedium.gridx = 0;
+		gbc_lblSpecMedium.gridy = 2;
+		specPizzaPanel.add(lblSpecMedium, gbc_lblSpecMedium);
+		
+		JTextField textSpecMedium = new JTextField();
+		textSpecMedium.setHorizontalAlignment(SwingConstants.RIGHT);
+		textSpecMedium.setText("$0.00");
+		GridBagConstraints gbc_textSpecMedium = new GridBagConstraints();
+		gbc_textSpecMedium.insets = new Insets(0, 0, 5, 5);
+		gbc_textSpecMedium.fill = GridBagConstraints.HORIZONTAL;
+		gbc_textSpecMedium.gridx = 2;
+		gbc_textSpecMedium.gridy = 2;
+		specPizzaPanel.add(textSpecMedium, gbc_textSpecMedium);
+		textSpecMedium.setColumns(10);
+		
+		JLabel lblSpecLarge = new JLabel("Large");
+		GridBagConstraints gbc_lblSpecLarge = new GridBagConstraints();
+		gbc_lblSpecLarge.gridwidth = 2;
+		gbc_lblSpecLarge.anchor = GridBagConstraints.EAST;
+		gbc_lblSpecLarge.insets = new Insets(0, 0, 0, 5);
+		gbc_lblSpecLarge.gridx = 0;
+		gbc_lblSpecLarge.gridy = 3;
+		specPizzaPanel.add(lblSpecLarge, gbc_lblSpecLarge);
+		
+		JTextField textSpecLarge = new JTextField();
+		textSpecLarge.setHorizontalAlignment(SwingConstants.RIGHT);
+		textSpecLarge.setText("$0.00");
+		GridBagConstraints gbc_textSpecLarge = new GridBagConstraints();
+		gbc_textSpecLarge.insets = new Insets(0, 0, 5, 5);
+		gbc_textSpecLarge.fill = GridBagConstraints.HORIZONTAL;
+		gbc_textSpecLarge.gridx = 2;
+		gbc_textSpecLarge.gridy = 3;
+		specPizzaPanel.add(textSpecLarge, gbc_textSpecLarge);
+		textSpecLarge.setColumns(10);
+		// END SPECIALTY PIZZA PRICE PANEL
+		
+		configAreaPanel.add(Box.createRigidArea(new Dimension(0, 40)));
+		
+		JPanel toppingsPanel = new JPanel();
+		toppingsPanel.setBackground(Pink);
+		configAreaPanel.add(toppingsPanel);
+		toppingsPanel.setLayout(new BoxLayout(toppingsPanel, BoxLayout.X_AXIS));
+		
+		JLabel lblToppingsPrice = new JLabel("Topping Price");
+		toppingsPanel.add(lblToppingsPrice);
+		
+		toppingsPanel.add(Box.createRigidArea(dimMargin));
+		
+		JTextField textToppingsPrice = new JTextField();
+		textToppingsPrice.setMaximumSize(new Dimension(100, 20));
+		textToppingsPrice.setText("$0.00");
+		toppingsPanel.add(textToppingsPrice);
+		textToppingsPrice.setColumns(5);
+		
+		configAreaPanel.add(Box.createRigidArea(new Dimension(0, 40)));
+		
+		JPanel taxPanel = new JPanel();
+		taxPanel.setBackground(Pink);
+		configAreaPanel.add(taxPanel);
+		taxPanel.setLayout(new BoxLayout(taxPanel, BoxLayout.X_AXIS));
+		
+		taxPanel.add(Box.createRigidArea(new Dimension(32, 0)));
+		
+		JLabel lblTaxPrice = new JLabel("Tax Rate");
+		taxPanel.add(lblTaxPrice);
+		
+		taxPanel.add(Box.createRigidArea(dimMargin));
+		
+		JTextField textTax = new JTextField();
+		textTax.setMaximumSize(new Dimension(100, 20));
+		textTax.setText("0%");
+		taxPanel.add(textTax);
+		textTax.setColumns(5);
+		
+		JPanel confirmAreaPanel = new JPanel();
+		confirmAreaPanel.setBackground(Pink);
+		confirmAreaPanel.setPreferredSize(dimHeadFoot);
+		priceCard.add(confirmAreaPanel, BorderLayout.SOUTH);
+		confirmAreaPanel.setLayout(new BoxLayout(confirmAreaPanel, BoxLayout.X_AXIS));
+		
+		confirmAreaPanel.add(Box.createHorizontalGlue());
+		
+		JButton btnSavePrice = new JButton("Save");
+		btnSavePrice.setFont(helB18);
+		btnSavePrice.setMaximumSize(dimOrder);
+		btnSavePrice.setMinimumSize(dimOrder);
+		btnSavePrice.setPreferredSize(dimOrder);
+		confirmAreaPanel.add(btnSavePrice);
+		
+		confirmAreaPanel.add(Box.createRigidArea(new Dimension(12,0)));
+		// END PRICE & RATE
+		
+		// BEGIN ADMIN
+		JPanel adminCard = new JPanel();
+		adminCard.setBackground(Pink);
+		subsysPanel.add(adminCard, ADMINCARD);
+		adminCard.setLayout(new BorderLayout(0, 0));
+		
+		JPanel tableHeaderPanel = new JPanel();
+		tableHeaderPanel.setBackground(Pink);
+		tableHeaderPanel.setPreferredSize(new Dimension(0, 40));
+		adminCard.add(tableHeaderPanel, BorderLayout.NORTH);
+		tableHeaderPanel.setLayout(new BoxLayout(tableHeaderPanel, BoxLayout.X_AXIS));
+		
+		tableHeaderPanel.add(Box.createRigidArea(new Dimension(92, 0)));
+		
+		JLabel lblTablePIN = new JLabel("PIN");
+		lblTablePIN.setFont(helB24);
+		tableHeaderPanel.add(lblTablePIN);
+		
+		tableHeaderPanel.add(Box.createRigidArea(new Dimension(78, 0)));
+		
+		JLabel lblEmployeeName = new JLabel("Employee Name");
+		lblEmployeeName.setFont(helB24);
+		tableHeaderPanel.add(lblEmployeeName);
+		
+		JPanel manageAreaPanel = new JPanel();
+		manageAreaPanel.setBackground(Pink);
+		manageAreaPanel.setPreferredSize(new Dimension(0, 90));
+		adminCard.add(manageAreaPanel, BorderLayout.SOUTH);
+		manageAreaPanel.setLayout(new BoxLayout(manageAreaPanel, BoxLayout.X_AXIS));
+		
+		manageAreaPanel.add(Box.createHorizontalGlue());
+		
+		JButton btnAdd = new JButton("Add Employee");
+		btnAdd.setPreferredSize(dimAction);
+		manageAreaPanel.add(btnAdd);
+		
+		manageAreaPanel.add(Box.createRigidArea(new Dimension(30, 0)));
+		
+		JButton btnEdit = new JButton("Edit Employee");
+		btnEdit.setPreferredSize(dimAction);
+		manageAreaPanel.add(btnEdit);
+		
+		manageAreaPanel.add(Box.createRigidArea(new Dimension(30, 0)));
+		
+		JButton btnDelete = new JButton("Delete Employee");
+		btnDelete.setPreferredSize(dimAction);
+		manageAreaPanel.add(btnDelete);
+		
+		manageAreaPanel.add(Box.createHorizontalGlue());
+		
+		JPanel middlePanel = new JPanel();
+		middlePanel.setBackground(Pink);
+		adminCard.add(middlePanel, BorderLayout.CENTER);
+		middlePanel.setLayout(new BoxLayout(middlePanel, BoxLayout.X_AXIS));
+		
+		middlePanel.add(Box.createRigidArea(new Dimension(40, 0)));
+		
+		JScrollPane scrollEmployeeTable = new JScrollPane();
+		scrollEmployeeTable.setAlignmentY(Component.TOP_ALIGNMENT);
+		scrollEmployeeTable.setMaximumSize(new Dimension(1360, 770));
+		scrollEmployeeTable.setMinimumSize(new Dimension(940, 500));
+		scrollEmployeeTable.setPreferredSize(new Dimension(940, 500));
+		middlePanel.add(scrollEmployeeTable);
+		
+		String[] employees = {"0000 Admin", "1234 Dumpty"};
+		
+		JList listEmployeeTable = new JList(employees);
+		listEmployeeTable.setModel(new AbstractListModel() {
+			String[] values = new String[] {"   0000     Admin", 
+					"   0001     Ace", 
+					"   0002     Duece", 
+					"   0003     Tre", 
+					"   0004     Fior", 
+					"   0005     Fi", 
+					"   0006     Seth", 
+					"   0007     Sev", 
+					"   0008     Ate", 
+					"   0009     Nye", 
+					"   0010     Tien", 
+					"   0011     Elv", 
+					"   0012     Twi", 
+					"   0013     Tret", 
+					"   0014     Fort", 
+					"   0015     Fit", 
+					"   0016     Setht", 
+					"   0017     Sevt", 
+					"   0018     Atet", 
+					"   0019     Nyent", 
+					"   0020     Twin"};
+			public int getSize() {
+				return values.length;
+			}
+			public Object getElementAt(int index) {
+				return values[index];
+			}
+		});
+		listEmployeeTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+		listEmployeeTable.setFont(new Font("Consolas", Font.PLAIN, 26));
+		scrollEmployeeTable.add(listEmployeeTable);
+		scrollEmployeeTable.setViewportView(listEmployeeTable);
+		
+		middlePanel.add(Box.createRigidArea(new Dimension(40, 0)));
+		// END ADMIN
+				
+		// BEGIN NAVIGATION ACTIONS
+		btnPOS.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				subHand.show(subsysPanel, POSCARD);
+				btnPOS.setEnabled(false);
+				btnPrice.setEnabled(true);
+				btnAdmin.setEnabled(true);
+			}
+		});
+		
+		btnPrice.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				subHand.show(subsysPanel, CONFIGCARD);
+				btnPrice.setEnabled(false);
+				btnPOS.setEnabled(true);
+				btnAdmin.setEnabled(true);
+			}
+		});
+		
+		btnAdmin.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				subHand.show(subsysPanel, ADMINCARD);
+				btnAdmin.setEnabled(false);
+				btnPOS.setEnabled(true);
+				btnPrice.setEnabled(true);
+			}
+		});
+		// END NAVIGATION ACTIONS
 	}
+	
+//	private class ScrollReceipt extends JScrollPane {
+//		
+//	}
 	
 	private MaskFormatter createFormatter(String s) {
 	    MaskFormatter formatter = null;
@@ -347,17 +772,17 @@ public class POS {
 	    return formatter;
 	}
 	
-	private void ActionLogin(final String pass, JButton btn, final JPanel next) {
-		btn.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-//				if(pass.equals("0000")) {
-					frmDominosPizzaPoint.getContentPane().remove(1);
-					frmDominosPizzaPoint.getContentPane().add(next, BorderLayout.CENTER);
-					frmDominosPizzaPoint.validate();
-//				}
-			}
-		});
-	}
+//	private void ActionLogin(final String pass, JButton btn, final JPanel next) {
+//		btn.addActionListener(new ActionListener() {
+//			public void actionPerformed(ActionEvent e) {
+////				if(pass.equals("0000")) {
+//					frmDominosPizzaPoint.getContentPane().remove(1);
+//					frmDominosPizzaPoint.getContentPane().add(next, BorderLayout.CENTER);
+//					frmDominosPizzaPoint.validate();
+////				}
+//			}
+//		});
+//	}
 	
 //	private void ActionTestHead(JButton btn, final JPanel target) {
 //		btn.addActionListener(new ActionListener() {
