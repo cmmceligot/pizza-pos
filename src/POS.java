@@ -755,6 +755,40 @@ public class POS extends JPanel{
 			}
 		});
 		// END NAVIGATION ACTIONS
+		
+		// BEGIN POS ACTIONS
+		btnPizza.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				PizzaFrame addition = new PizzaFrame();
+			}
+		});
+		
+		btnSoda.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				SodaFrame addition = new PizzaFrame();
+			}
+		});
+		// END POS ACTIONS
+		
+		// BEGIN ADMIN ACTIONS
+		btnAdd.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				// TODO Ensure EMPLOYEES is name of EmployeeList object; double-check pass by reference
+//				EmployeeFrame addition = new EmployeeFrame(employees, "", "");
+			}
+		});
+		
+		btnEdit.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				// TODO Fix "getPin" & "getName"
+//				EmployeeFrame edits = new EmployeeFrame(employees, getPin, getName);
+			}
+		});
+		// END ADMIN ACTIONS
 	}
 	
 //	private class ScrollReceipt extends JScrollPane {
