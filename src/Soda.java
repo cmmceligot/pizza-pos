@@ -2,8 +2,13 @@ public class Soda extends SalesItem {
 
 	@Override
 	public String toString() {
-		// TODO Auto-generated method stub
+		String out;
+		String qty = ((Integer) this.getQuantity()).toString();
+		String total = "$" + String.format("%.2f", this.getTotal());
 		
-		return ((Integer) getQuantity()).toString();
+		out = String.format("%3s  %-18s%7s %n %n",
+				qty, "  ", "2-Liter Soda", total);
+		
+		return out;
 	}
 }

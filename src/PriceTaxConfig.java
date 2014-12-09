@@ -1,84 +1,75 @@
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
+import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.text.DecimalFormat;
+import java.text.NumberFormat;
 import java.util.HashMap;
 import java.util.Iterator;
 
 
 public class PriceTaxConfig {
-	static HashMap<String, Double> map = new HashMap<String, Double>();
+	static HashMap<String, String> map = new HashMap<String, String>();
+	static NumberFormat formatter = new DecimalFormat("#0.00"); 
 	
-	public HashMap<String, Double> setPriceTax(HashMap<String, Double> someMap){
-		someMap.put("Soda", 0.00);
-		someMap.put("Small Regular", 0.00);
-		someMap.put("Medium Regular", 0.00);
-		someMap.put("Large Regular", 0.00);
-		someMap.put("Small Specialty", 0.00);
-		someMap.put("Medium Specialty", 0.00);
-		someMap.put("Large Specialty", 0.00);
-		someMap.put("Toppings", 0.00);
-		someMap.put("Tax Rate", 0.00);
-		
+	public HashMap<String, String> editTaxRate(HashMap<String, String> someMap, String oldPrice, double newPrice){
+		someMap.remove(oldPrice);
+		String newTax = String.valueOf(newPrice);
+		someMap.put("Tax Rate", newTax);
 		return someMap;
 	}
 	
-	public HashMap<String, Double> editTaxRate(HashMap<String, Double> someMap, Double oldPrice, Double newPrice){
+	public HashMap<String, String> editToppings(HashMap<String, String> someMap, String oldPrice, double newPrice){
 		someMap.remove(oldPrice);
-		someMap.put("Tax Rate", newPrice);
-		return someMap;
-	}
-	
-	public HashMap<String, Double> editToppings(HashMap<String, Double> someMap, Double oldPrice, Double newPrice){
-		someMap.remove(oldPrice);
-		someMap.put("Toppings", newPrice);
+		someMap.put("Toppings", formatter.format(newPrice));
 		return someMap;
 	}
 
-	public HashMap<String, Double> editSoda(HashMap<String, Double> someMap, Double oldPrice, Double newPrice){
+	public HashMap<String, String> editSoda(HashMap<String, String> someMap, String oldPrice, double newPrice){
 		someMap.remove(oldPrice);
-		someMap.put("Soda", newPrice);
+		someMap.put("Soda", formatter.format(newPrice));
 		return someMap;
 	}
 	
-	public HashMap<String, Double> editSmallRegular(HashMap<String, Double> someMap, Double oldPrice, Double newPrice){
+	public HashMap<String, String> editSmallRegular(HashMap<String, String> someMap, String oldPrice, double newPrice){
 		someMap.remove(oldPrice);
-		someMap.put("Small Regular", newPrice);
+		someMap.put("Small Regular", formatter.format(newPrice));
 		return someMap;
 	}
 	
-    public HashMap<String, Double> editMediumRegular(HashMap<String, Double> someMap, Double oldPrice, Double newPrice){
+    public HashMap<String, String> editMediumRegular(HashMap<String, String> someMap, String oldPrice, double newPrice){
     	someMap.remove(oldPrice);
-		someMap.put("Medium Regular", newPrice);
+		someMap.put("Medium Regular", formatter.format(newPrice));
 		return someMap;
 	}
     
-	public HashMap<String, Double> editLargeRegular(HashMap<String, Double> someMap, Double oldPrice, Double newPrice){
+	public HashMap<String, String> editLargeRegular(HashMap<String, String> someMap, String oldPrice, double newPrice){
 		someMap.remove(oldPrice);
-		someMap.put("Large Regular", newPrice);
+		someMap.put("Large Regular", formatter.format(newPrice));
 		return someMap;
 	}
 	
-	public HashMap<String, Double> editSmallSpecialty(HashMap<String, Double> someMap, Double oldPrice, Double newPrice){
+	public HashMap<String, String> editSmallSpecialty(HashMap<String, String> someMap, String oldPrice, double newPrice){
 		someMap.remove(oldPrice);
-		someMap.put("Small Specialty", newPrice);
+		someMap.put("Small Specialty", String.valueOf(formatter.format(newPrice)));
 		return someMap;
 	}
 	
-    public HashMap<String, Double> editMediumSpecialty(HashMap<String, Double> someMap, Double oldPrice, Double newPrice){
+    public HashMap<String, String> editMediumSpecialty(HashMap<String, String> someMap, String oldPrice, double newPrice){
     	someMap.remove(oldPrice);
-		someMap.put("Medium Specialty", newPrice);
+		someMap.put("Medium Specialty", formatter.format(newPrice));
 		return someMap;
 	}
     
-	public HashMap<String, Double> editLargeSpecialty(HashMap<String, Double> someMap, Double oldPrice, Double newPrice){
+	public HashMap<String, String> editLargeSpecialty(HashMap<String, String> someMap, String oldPrice, double newPrice){
 		someMap.remove(oldPrice);
-		someMap.put("Large Specialty", newPrice);
+		someMap.put("Large Specialty", formatter.format(newPrice));
 		return someMap;
 	}
 
-	public void outputMap(HashMap<String, Double> someMap){
+	public void outputMap(HashMap<String, String> someMap){
 		Iterator<String> keySetIterator = someMap.keySet().iterator();
 		try{
 			FileWriter file = new FileWriter("storedPriceTax.txt");
@@ -94,18 +85,32 @@ public class PriceTaxConfig {
 	}
 	
 	@SuppressWarnings("finally")
-	public HashMap<String, Double> inputMap(){
+	public HashMap<String, String> inputMap(){
 		try{
-			FileReader file = new FileReader("storedPriceTax.txt");
-			BufferedReader input = new BufferedReader(file);
-			
-			String line = "";
-	        while ((line = input.readLine()) != null) {
-	            String[] parts = line.split("=");
-	            map.put(parts[0], Double.valueOf(parts[1]));
-	        }	
-	        
-	        input.close();
+			File f = new File("storedPriceTax.txt");
+
+			if(f.exists()){
+				FileReader file = new FileReader(f);
+				BufferedReader input = new BufferedReader(file);
+				
+				String line = "";
+		        while ((line = input.readLine()) != null) {
+		            String[] parts = line.split("=");
+		            map.put(parts[0], parts[1]);
+		        }	
+		        input.close();
+			}else{
+				f.createNewFile();
+				FileReader file = new FileReader(f);
+				BufferedReader input = new BufferedReader(file);
+				
+				String line = "";
+		        while ((line = input.readLine()) != null) {
+		            String[] parts = line.split("=");
+		            map.put(parts[0], parts[1]);
+		        }	
+		        input.close();
+			}
 		}catch(IOException ioe){
 			ioe.printStackTrace();
 	    }catch(Exception fnf){
@@ -114,4 +119,5 @@ public class PriceTaxConfig {
 	    	return map;
 	    }
 	}
+
 }
