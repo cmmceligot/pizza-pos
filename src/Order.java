@@ -43,7 +43,7 @@ public class Order{
 		NumberFormat formatter = NumberFormat.getCurrencyInstance();
 		Writer output = null;
 		
-		try{
+		try {
 			File f = new File("orderNumber.txt");
 		
 			if(!f.exists()){
@@ -62,23 +62,23 @@ public class Order{
 		String out;
 		String strOrderNum = " ORDER #" + String.format("%d", orderNumber);
 		String strItems = "";
-		String strTaxRate = "Tax (" + String.format("%f", taxRate) + "%)";
-		String strSub = " " + formatter.format(subtotal);
-		String strTaxAmt = " " + formatter.format(taxAmount);;
-		String strGrand = " " + formatter.format(grandTotal);;
+		String strTaxRate = "Tax (" + String.format("%.2f", taxRate) + "%)";
+		String strSub = "Subtotal " + formatter.format(subtotal);
+		String strTaxAmt = " " + formatter.format(taxAmount);
+		String strTaxLine = strTaxRate + strTaxAmt;
+		String strGrand = "Grand Total " + formatter.format(grandTotal);
 		
 		for (SalesItem item : itemsOrdered) {
 			strItems += item.toString();
 			
 		}
 		
-		//System.out.println(strItems);
-		out = String.format("%s%n%-31s%n%n%s%n",
-					strOrderNum, employee, " QTY  ITEM                PRICE")
-				+ strItems
-				+ String.format("%n%20s%11s%n%20s%11s%n%20s%11s%n",
-					"Subtotal", strSub, strTaxRate, strTaxAmt, "Grand Total", strGrand);
-		
+		out = String.format("%s%n %-30s%n%n%s%n",
+				strOrderNum, employee, " QTY  ITEM                PRICE")
+			+ strItems
+			+ String.format("%n%31s%n%31s%n%31s",
+				strSub, strTaxLine, strGrand);
+	
 		return out;
 	}
 	

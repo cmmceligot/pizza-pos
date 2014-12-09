@@ -5,7 +5,10 @@ public class Pizza extends SalesItem {
 	public EnumSet<Topping> toppings;
 	double toppingsPrice;
 	
-	public Pizza() {	
+	public Pizza() {
+		size = Size.Small;
+		toppings = EnumSet.of(Topping.Ham);
+		toppings.clear();
 	}
 	
 	public Pizza(Size size, EnumSet<Topping> toppings){
@@ -39,6 +42,41 @@ public class Pizza extends SalesItem {
 		}
 		
 		desc = strSize + " Pizza";
+		
+		if (this.toppings.contains(Topping.Bacon)) {
+			strTops += "       + Bacon\n";
+		}
+		if (this.toppings.contains(Topping.BlackOlives)) {
+			strTops += "       + Black Olives\n";
+		}
+		if (this.toppings.contains(Topping.Chicken)) {
+			strTops += "       + Chicken\n";
+		}
+		if (this.toppings.contains(Topping.ExtraCheese)) {
+			strTops += "       + Extra Cheese\n";
+		}
+		if (this.toppings.contains(Topping.GreenPeppers)) {
+			strTops += "       + Green Peppers\n";
+		}
+		if (this.toppings.contains(Topping.Ham)) {
+			strTops += "       + Ham\n";
+		}
+		if (this.toppings.contains(Topping.Mushrooms)) {
+			strTops += "       + Mushrooms\n";
+		}
+		if (this.toppings.contains(Topping.Onions)) {
+			strTops += "       + Onions\n";
+		}
+		if (this.toppings.contains(Topping.Pepperoni)) {
+			strTops += "       + Pepperoni\n";
+		}
+		if (this.toppings.contains(Topping.Pineapple)) {
+			strTops += "       + Pineapple\n";
+		}
+		
+		if (this.toppings.contains(Topping.Sausage)) {
+			strTops += "       + Sausage\n";
+		}
 		
 		strTops += "\n";
 		

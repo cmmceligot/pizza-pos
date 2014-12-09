@@ -67,6 +67,8 @@ public class POS extends JPanel{
 	static EmployeeList testmap = new EmployeeList();
 	static PriceTaxConfig newPriceTax = new PriceTaxConfig();
 	static HashMap<String, String> priceTax = new HashMap<String, String>();
+	static int sodaQuantity = 0;
+	static int pizzaQuantity = 0;
 	
 	JList listEmployeeTable = new JList();
 	JLabel lblEmployee = new JLabel();
@@ -823,6 +825,8 @@ public class POS extends JPanel{
 		btnLogOut.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
+				textReceipt.setText("");
+				currentOrder.cancelOrder();
 				metaHand.previous(frmDominosPizzaPoint.getContentPane());
 			}
 		});
@@ -1200,18 +1204,16 @@ public class POS extends JPanel{
 					bottles.setPrice(Double.valueOf(textSodaPrice.getText()));
 					currentOrder.setTaxRate(Double.valueOf(textTax.getText()));
 					bottles.setQuantity((Integer)spinner.getValue());
-					if(bottles.getQuantity() > 100){
+					sodaQuantity = (sodaQuantity + bottles.getQuantity());
+					if(sodaQuantity > 100){
+						sodaQuantity = (sodaQuantity - bottles.getQuantity());
 						JOptionPane.showMessageDialog(null,
-								"You cannot order more than 100 sodas." + (bottles.getQuantity()),
+								"You cannot order more than 100 sodas." + (sodaQuantity),
 				                "Error Message",
 				                JOptionPane.ERROR_MESSAGE);
 					}else{
 						currentOrder.addItem(bottles);
 						textReceipt.setText(currentOrder.makeReceipt());
-						
-						btnAdmin.setEnabled(false);
-						btnPrice.setEnabled(false);
-						
 						((JFrame) btnOk.getTopLevelAncestor()).dispose();
 					}
 				}
@@ -1564,15 +1566,16 @@ public class POS extends JPanel{
 					currentOrder.setTaxRate(Double.valueOf(textTax.getText()));
 					pie.setQuantity((Integer) spinnerQty.getValue());
 					
-					if(pie.getQuantity() > 100){
+					pizzaQuantity = (pizzaQuantity + pie.getQuantity());
+					if(pizzaQuantity > 100){
+						pizzaQuantity = (pizzaQuantity - pie.getQuantity());
 						valid = false;
 						JOptionPane.showMessageDialog(null,
-								"You cannot order more than 100 sodas.",
+								"You cannot order more than 100 pizza." + (pizzaQuantity),
 				                "Error Message",
 				                JOptionPane.ERROR_MESSAGE);
 					}
-					
-					if (valid) {
+					if (valid){
 						currentOrder.addItem(pie);
 						textReceipt.setText(currentOrder.makeReceipt());
 						((JFrame) btnOk.getTopLevelAncestor()).dispose();
@@ -1591,7 +1594,6 @@ public class POS extends JPanel{
 		}
 	}
 
-	
 	private MaskFormatter createFormatter(String s) {
 	    MaskFormatter formatter = null;
 	    try {
