@@ -1,10 +1,8 @@
 import java.awt.BorderLayout;
 import java.awt.Dimension;
-import java.awt.EventQueue;
 
 import javax.swing.JFrame;
 import javax.swing.JPanel;
-import javax.swing.border.EmptyBorder;
 import javax.swing.JButton;
 import javax.swing.BoxLayout;
 
@@ -20,38 +18,20 @@ import java.awt.event.ActionListener;
 
 
 public class SodaFrame extends JFrame {
-
 	private JPanel contentPane;
-
-//	/**
-//	 * Launch the application.
-//	 */
-//	public static void main(String[] args) {
-//		EventQueue.invokeLater(new Runnable() {
-//			public void run() {
-//				try {
-//					SodaFrame frame = new SodaFrame();
-//					frame.setVisible(true);
-//				} catch (Exception e) {
-//					e.printStackTrace();
-//				}
-//			}
-//		});
-//	}
 
 	public SodaFrame() {
 		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 		setBounds(100, 100, 450, 300);
 		contentPane = new JPanel();
 		this.setTitle("Add Soda");
-		this.setPreferredSize(new Dimension(280, 180));  
-		this.setMinimumSize(this.getPreferredSize());
-		this.setMaximumSize(this.getPreferredSize());
-		this.setAlwaysOnTop(true);
+		this.setPreferredSize(new Dimension(280, 180)); 
+		this.setResizable(false);
 		this.pack();  
 		this.setLocationRelativeTo(null); 
 		setContentPane(contentPane);
 		contentPane.setLayout(new BorderLayout(0, 0));
+		this.setVisible(true);
 		
 		JPanel qtyPanel = new JPanel();
 		contentPane.add(qtyPanel, BorderLayout.CENTER);
@@ -110,10 +90,11 @@ public class SodaFrame extends JFrame {
 		btnCancel.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				btnCancel.getParent().setEnabled(false);
+				
+				((JFrame) btnCancel.getTopLevelAncestor()).dispose();
 			}
 		});
 		// END ACTIONS
 	}
-
 }
+

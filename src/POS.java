@@ -2,9 +2,11 @@ import javax.imageio.ImageIO;
 import javax.swing.Box;
 import javax.swing.ImageIcon;
 import javax.swing.JFrame;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 
 import java.awt.EventQueue;
+import java.awt.HeadlessException;
 import java.awt.Image;
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -13,7 +15,7 @@ import java.awt.Dimension;
 import javax.swing.JLabel;
 
 import java.awt.Font;
-import java.io.IOException;
+
 import javax.swing.JButton;
 import javax.swing.BoxLayout;
 import javax.swing.JFormattedTextField;
@@ -21,36 +23,71 @@ import javax.swing.JFormattedTextField;
 import java.awt.Component;
 
 import javax.swing.SwingConstants;
+import javax.swing.border.EmptyBorder;
 import javax.swing.text.MaskFormatter;
+
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
+
 import javax.swing.JTextArea;
 import javax.swing.JScrollPane;
+
 import java.awt.CardLayout;
+
 import javax.swing.JTextField;
+
 import java.awt.GridBagLayout;
 import java.awt.GridBagConstraints;
 import java.awt.Insets;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
+
 import javax.swing.JList;
 import javax.swing.ListSelectionModel;
-import javax.swing.AbstractListModel;
-import javax.swing.ScrollPaneConstants;
+
+//TODO display prices with two decimal places
+
 
 
 public class POS extends JPanel{
 
 	private JFrame frmDominosPizzaPoint;
+	static HashMap<String, String> map = new HashMap<String, String>();
+	static EmployeeList testmap = new EmployeeList();
+	static PriceTaxConfig newPriceTax = new PriceTaxConfig();
+	static HashMap<String, Double> priceTax = new HashMap<String, Double>();
+	//priceTax = newPriceTax.setPriceTax(priceTax);
+	JList listEmployeeTable = new JList();
+	JLabel lblEmployee = new JLabel();
 	/**
 	 * Launch the application.
 	 */
 	public static void main(String[] args) {
+		map = testmap.inputMap();
+		priceTax = newPriceTax.inputMap();
+		if(priceTax.isEmpty()){
+			priceTax.put("Soda", 0.00);
+			priceTax.put("Small Regular", 0.00);
+			priceTax.put("Medium Regular", 0.00);
+			priceTax.put("Large Regular", 0.00);
+			priceTax.put("Small Specialty", 0.00);
+			priceTax.put("Medium Specialty", 0.00);
+			priceTax.put("Large Specialty", 0.00);
+			priceTax.put("Toppings", 0.00);
+			priceTax.put("Tax Rate", 0.00);
+			
+			newPriceTax.outputMap(priceTax);
+			newPriceTax.inputMap();
+		}
+		
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
 				try {
 					POS window = new POS();
 					window.frmDominosPizzaPoint.setVisible(true);
 				} catch (Exception e) {
-					e.printStackTrace();
 				}
 			}
 		});
@@ -78,9 +115,9 @@ public class POS extends JPanel{
 		try {
 			image = ImageIO.read(getClass().getResource("/Domino'sIcon.png"));
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+		
 		ImageIcon icon = new ImageIcon(image);
 		Font hel28 = new Font("Helvetica", Font.PLAIN, 28);
 		Font helB24 = new Font("Helvetica", Font.BOLD, 24);
@@ -157,7 +194,8 @@ public class POS extends JPanel{
 		lblPin.setFont(new Font("Helvetica", Font.BOLD, 36));
 		loginPanel.add(lblPin);
 		
-		JFormattedTextField formattedPIN = new JFormattedTextField(createFormatter("####"));
+		final JFormattedTextField formattedPIN = new JFormattedTextField(createFormatter("####"));
+		formattedPIN.setFocusLostBehavior(JFormattedTextField.PERSIST);
 		formattedPIN.setColumns(4);
 		formattedPIN.setToolTipText("Four-digit employee number");
 		formattedPIN.setHorizontalAlignment(SwingConstants.CENTER);
@@ -174,13 +212,6 @@ public class POS extends JPanel{
 		btnLogOn.setMaximumSize(dimLogin);
 		btnLogOn.setPreferredSize(dimLogin);
 		loginPanel.add(btnLogOn);
-		
-		btnLogOn.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				metaHand.next(frmDominosPizzaPoint.getContentPane());
-			}
-		});
 		
 		loginPanel.add(Box.createVerticalGlue());
 		
@@ -235,7 +266,7 @@ public class POS extends JPanel{
 		
 		headerNav.add(Box.createRigidArea(dimMargin));
 		
-		JLabel lblEmployee = new JLabel("Emanuel Jimenez Marquez Filipe Rosito");
+		lblEmployee = new JLabel("Employee Name");
 		lblEmployee.setMaximumSize(new Dimension(1440, 60));
 		lblEmployee.setMinimumSize(new Dimension(180, 16));
 		lblEmployee.setAlignmentX(Component.RIGHT_ALIGNMENT);
@@ -251,13 +282,6 @@ public class POS extends JPanel{
 		btnLogOut.setMinimumSize(dimNav);
 		btnLogOut.setMaximumSize(dimNav);
 		headerNav.add(btnLogOut);
-		
-		btnLogOut.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				metaHand.previous(frmDominosPizzaPoint.getContentPane());
-			}
-		});
 		
 		headerNav.add(Box.createRigidArea(dimMargin));
 //		END NAV HEADER		//
@@ -381,14 +405,13 @@ public class POS extends JPanel{
 		
 		sodaPanel.add(Box.createRigidArea(new Dimension(22, 0)));
 		
-		JLabel lblSodaPrice = new JLabel("Soda Price");
+		JLabel lblSodaPrice = new JLabel("Soda Price $");
 		sodaPanel.add(lblSodaPrice);
 		
-		sodaPanel.add(Box.createRigidArea(dimMargin));
-		
-		JTextField textSodaPrice = new JTextField();
+		final JTextField textSodaPrice = new JTextField();
 		textSodaPrice.setMaximumSize(new Dimension(100, 20));
-		textSodaPrice.setText("$0.00");
+		textSodaPrice.setText(String.valueOf(priceTax.get("Soda")));
+		textSodaPrice.setHorizontalAlignment(JTextField.RIGHT);
 		sodaPanel.add(textSodaPrice);
 		textSodaPrice.setColumns(5);
 		
@@ -420,17 +443,17 @@ public class POS extends JPanel{
 		gbc_lblRegPizza.gridy = 0;
 		regPizzaPanel.add(lblRegPizza, gbc_lblRegPizza);
 		
-		JLabel lblRegSmall = new JLabel("Small");
+		JLabel lblRegSmall = new JLabel("Small $");
 		GridBagConstraints gbc_lblRegSmall = new GridBagConstraints();
 		gbc_lblRegSmall.anchor = GridBagConstraints.EAST;
-		gbc_lblRegSmall.insets = new Insets(0, 0, 5, 5);
+		gbc_lblRegSmall.insets = new Insets(0, 0, 5, 0);
 		gbc_lblRegSmall.gridx = 0;
 		gbc_lblRegSmall.gridy = 1;
 		regPizzaPanel.add(lblRegSmall, gbc_lblRegSmall);
 		
-		JTextField textRegSmall = new JTextField();
+		final JTextField textRegSmall = new JTextField();
 		textRegSmall.setHorizontalAlignment(SwingConstants.RIGHT);
-		textRegSmall.setText("$0.00");
+		textRegSmall.setText(String.valueOf(priceTax.get("Small Regular")));
 		GridBagConstraints gbc_textRegSmall = new GridBagConstraints();
 		gbc_textRegSmall.gridwidth = 2;
 		gbc_textRegSmall.insets = new Insets(0, 0, 5, 5);
@@ -440,17 +463,17 @@ public class POS extends JPanel{
 		regPizzaPanel.add(textRegSmall, gbc_textRegSmall);
 		textRegSmall.setColumns(10);
 		
-		JLabel lblRegMedium = new JLabel("Medium");
+		JLabel lblRegMedium = new JLabel("Medium $");
 		GridBagConstraints gbc_lblRegMedium = new GridBagConstraints();
 		gbc_lblRegMedium.anchor = GridBagConstraints.EAST;
-		gbc_lblRegMedium.insets = new Insets(0, 0, 5, 5);
+		gbc_lblRegMedium.insets = new Insets(0, 0, 5, 0);
 		gbc_lblRegMedium.gridx = 0;
 		gbc_lblRegMedium.gridy = 2;
 		regPizzaPanel.add(lblRegMedium, gbc_lblRegMedium);
 		
-		JTextField textRegMedium = new JTextField();
+		final JTextField textRegMedium = new JTextField();
 		textRegMedium.setHorizontalAlignment(SwingConstants.RIGHT);
-		textRegMedium.setText("$0.00");
+		textRegMedium.setText(String.valueOf(priceTax.get("Medium Regular")));
 		GridBagConstraints gbc_textRegMedium = new GridBagConstraints();
 		gbc_textRegMedium.gridwidth = 2;
 		gbc_textRegMedium.insets = new Insets(0, 0, 5, 5);
@@ -460,17 +483,16 @@ public class POS extends JPanel{
 		regPizzaPanel.add(textRegMedium, gbc_textRegMedium);
 		textRegMedium.setColumns(10);
 		
-		JLabel lblRegLarge = new JLabel("Large");
+		JLabel lblRegLarge = new JLabel("Large $");
 		GridBagConstraints gbc_lblRegLarge = new GridBagConstraints();
 		gbc_lblRegLarge.anchor = GridBagConstraints.EAST;
-		gbc_lblRegLarge.insets = new Insets(0, 0, 0, 5);
 		gbc_lblRegLarge.gridx = 0;
 		gbc_lblRegLarge.gridy = 3;
 		regPizzaPanel.add(lblRegLarge, gbc_lblRegLarge);
 		
-		JTextField textRegLarge = new JTextField();
+		final JTextField textRegLarge = new JTextField();
 		textRegLarge.setHorizontalAlignment(SwingConstants.RIGHT);
-		textRegLarge.setText("$0.00");
+		textRegLarge.setText(String.valueOf(priceTax.get("Large Regular")));
 		GridBagConstraints gbc_textRegLarge = new GridBagConstraints();
 		gbc_textRegLarge.gridwidth = 2;
 		gbc_textRegLarge.insets = new Insets(0, 0, 5, 5);
@@ -503,18 +525,18 @@ public class POS extends JPanel{
 		gbc_lblSpecPizza.gridy = 0;
 		specPizzaPanel.add(lblSpecPizza, gbc_lblSpecPizza);
 		
-		JLabel lblSpecSmall = new JLabel("Small");
+		JLabel lblSpecSmall = new JLabel("Small $");
 		GridBagConstraints gbc_lblSpecSmall = new GridBagConstraints();
 		gbc_lblSpecSmall.gridwidth = 2;
 		gbc_lblSpecSmall.anchor = GridBagConstraints.EAST;
-		gbc_lblSpecSmall.insets = new Insets(0, 0, 5, 5);
+		gbc_lblSpecSmall.insets = new Insets(0, 0, 5, 0);
 		gbc_lblSpecSmall.gridx = 0;
 		gbc_lblSpecSmall.gridy = 1;
 		specPizzaPanel.add(lblSpecSmall, gbc_lblSpecSmall);
 		
-		JTextField textSpecSmall = new JTextField();
+		final JTextField textSpecSmall = new JTextField();
 		textSpecSmall.setHorizontalAlignment(SwingConstants.RIGHT);
-		textSpecSmall.setText("$0.00");
+		textSpecSmall.setText(String.valueOf(priceTax.get("Small Specialty")));
 		GridBagConstraints gbc_textSpecSmall = new GridBagConstraints();
 		gbc_textSpecSmall.insets = new Insets(0, 0, 5, 5);
 		gbc_textSpecSmall.fill = GridBagConstraints.HORIZONTAL;
@@ -523,18 +545,18 @@ public class POS extends JPanel{
 		specPizzaPanel.add(textSpecSmall, gbc_textSpecSmall);
 		textSpecSmall.setColumns(10);
 		
-		JLabel lblSpecMedium = new JLabel("Medium");
+		JLabel lblSpecMedium = new JLabel("Medium $");
 		GridBagConstraints gbc_lblSpecMedium = new GridBagConstraints();
 		gbc_lblSpecMedium.gridwidth = 2;
 		gbc_lblSpecMedium.anchor = GridBagConstraints.EAST;
-		gbc_lblSpecMedium.insets = new Insets(0, 0, 5, 5);
+		gbc_lblSpecMedium.insets = new Insets(0, 0, 5, 0);
 		gbc_lblSpecMedium.gridx = 0;
 		gbc_lblSpecMedium.gridy = 2;
 		specPizzaPanel.add(lblSpecMedium, gbc_lblSpecMedium);
 		
-		JTextField textSpecMedium = new JTextField();
+		final JTextField textSpecMedium = new JTextField();
 		textSpecMedium.setHorizontalAlignment(SwingConstants.RIGHT);
-		textSpecMedium.setText("$0.00");
+		textSpecMedium.setText(String.valueOf(priceTax.get("Medium Specialty")));
 		GridBagConstraints gbc_textSpecMedium = new GridBagConstraints();
 		gbc_textSpecMedium.insets = new Insets(0, 0, 5, 5);
 		gbc_textSpecMedium.fill = GridBagConstraints.HORIZONTAL;
@@ -543,18 +565,17 @@ public class POS extends JPanel{
 		specPizzaPanel.add(textSpecMedium, gbc_textSpecMedium);
 		textSpecMedium.setColumns(10);
 		
-		JLabel lblSpecLarge = new JLabel("Large");
+		JLabel lblSpecLarge = new JLabel("Large $");
 		GridBagConstraints gbc_lblSpecLarge = new GridBagConstraints();
 		gbc_lblSpecLarge.gridwidth = 2;
 		gbc_lblSpecLarge.anchor = GridBagConstraints.EAST;
-		gbc_lblSpecLarge.insets = new Insets(0, 0, 0, 5);
 		gbc_lblSpecLarge.gridx = 0;
 		gbc_lblSpecLarge.gridy = 3;
 		specPizzaPanel.add(lblSpecLarge, gbc_lblSpecLarge);
 		
-		JTextField textSpecLarge = new JTextField();
+		final JTextField textSpecLarge = new JTextField();
 		textSpecLarge.setHorizontalAlignment(SwingConstants.RIGHT);
-		textSpecLarge.setText("$0.00");
+		textSpecLarge.setText(String.valueOf(priceTax.get("Large Specialty")));
 		GridBagConstraints gbc_textSpecLarge = new GridBagConstraints();
 		gbc_textSpecLarge.insets = new Insets(0, 0, 5, 5);
 		gbc_textSpecLarge.fill = GridBagConstraints.HORIZONTAL;
@@ -571,14 +592,13 @@ public class POS extends JPanel{
 		configAreaPanel.add(toppingsPanel);
 		toppingsPanel.setLayout(new BoxLayout(toppingsPanel, BoxLayout.X_AXIS));
 		
-		JLabel lblToppingsPrice = new JLabel("Topping Price");
+		JLabel lblToppingsPrice = new JLabel("Topping Price $");
 		toppingsPanel.add(lblToppingsPrice);
 		
-		toppingsPanel.add(Box.createRigidArea(dimMargin));
-		
-		JTextField textToppingsPrice = new JTextField();
+		final JTextField textToppingsPrice = new JTextField();
 		textToppingsPrice.setMaximumSize(new Dimension(100, 20));
-		textToppingsPrice.setText("$0.00");
+		textToppingsPrice.setText(String.valueOf(priceTax.get("Toppings")));
+		textToppingsPrice.setHorizontalAlignment(JTextField.RIGHT);
 		toppingsPanel.add(textToppingsPrice);
 		textToppingsPrice.setColumns(5);
 		
@@ -589,18 +609,22 @@ public class POS extends JPanel{
 		configAreaPanel.add(taxPanel);
 		taxPanel.setLayout(new BoxLayout(taxPanel, BoxLayout.X_AXIS));
 		
-		taxPanel.add(Box.createRigidArea(new Dimension(32, 0)));
+		taxPanel.add(Box.createRigidArea(new Dimension(48, 0)));
 		
 		JLabel lblTaxPrice = new JLabel("Tax Rate");
 		taxPanel.add(lblTaxPrice);
 		
-		taxPanel.add(Box.createRigidArea(dimMargin));
+		taxPanel.add(Box.createRigidArea(new Dimension(4, 0)));
 		
-		JTextField textTax = new JTextField();
+		final JTextField textTax = new JTextField();
 		textTax.setMaximumSize(new Dimension(100, 20));
-		textTax.setText("0%");
+		textTax.setText(String.valueOf(priceTax.get("Tax Rate")));
+		textTax.setHorizontalAlignment(JTextField.RIGHT);
 		taxPanel.add(textTax);
 		textTax.setColumns(5);
+		
+		JLabel lblPercent = new JLabel("%");
+		taxPanel.add(lblPercent);
 		
 		JPanel confirmAreaPanel = new JPanel();
 		confirmAreaPanel.setBackground(Pink);
@@ -619,6 +643,7 @@ public class POS extends JPanel{
 		
 		confirmAreaPanel.add(Box.createRigidArea(new Dimension(12,0)));
 		// END PRICE & RATE
+
 		
 		// BEGIN ADMIN
 		JPanel adminCard = new JPanel();
@@ -684,38 +709,17 @@ public class POS extends JPanel{
 		scrollEmployeeTable.setPreferredSize(new Dimension(940, 500));
 		middlePanel.add(scrollEmployeeTable);
 		
-		String[] employees = {"0000 Admin", "1234 Dumpty"};
+		//String[] employees = {"0000 Admin", "1234 Dumpty"};
+		final ArrayList<String> employees = new ArrayList<String>();
+		employees.add("   0000     Administrator");
 		
-		JList listEmployeeTable = new JList(employees);
-		listEmployeeTable.setModel(new AbstractListModel() {
-			String[] values = new String[] {"   0000     Admin", 
-					"   0001     Ace", 
-					"   0002     Duece", 
-					"   0003     Tre", 
-					"   0004     Fior", 
-					"   0005     Fi", 
-					"   0006     Seth", 
-					"   0007     Sev", 
-					"   0008     Ate", 
-					"   0009     Nye", 
-					"   0010     Tien", 
-					"   0011     Elv", 
-					"   0012     Twi", 
-					"   0013     Tret", 
-					"   0014     Fort", 
-					"   0015     Fit", 
-					"   0016     Setht", 
-					"   0017     Sevt", 
-					"   0018     Atet", 
-					"   0019     Nyent", 
-					"   0020     Twin"};
-			public int getSize() {
-				return values.length;
-			}
-			public Object getElementAt(int index) {
-				return values[index];
-			}
-		});
+		Iterator<String> keySetIterator = map.keySet().iterator();
+		while(keySetIterator.hasNext()){
+			String key = keySetIterator.next();
+			employees.add("   " + String.valueOf(key) + "     " + map.get(key));
+        }
+
+		listEmployeeTable = new JList(employees.toArray());
 		listEmployeeTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		listEmployeeTable.setFont(new Font("Consolas", Font.PLAIN, 26));
 		scrollEmployeeTable.add(listEmployeeTable);
@@ -724,8 +728,106 @@ public class POS extends JPanel{
 		middlePanel.add(Box.createRigidArea(new Dimension(40, 0)));
 		// END ADMIN
 				
+		btnSavePrice.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				newPriceTax.editToppings(priceTax, Double.valueOf(priceTax.get("Toppings")), Double.valueOf(textToppingsPrice.getText()));
+				textToppingsPrice.setText(String.valueOf(priceTax.get("Toppings")));
+				
+				newPriceTax.editTaxRate(priceTax, Double.valueOf(priceTax.get("Tax Rate")), Double.valueOf(textTax.getText()));
+				textTax.setText(String.valueOf(priceTax.get("Tax Rate")));
+				
+				newPriceTax.editSoda(priceTax, Double.valueOf(priceTax.get("Soda")), Double.valueOf(textSodaPrice.getText()));
+				textSodaPrice.setText(String.valueOf(priceTax.get("Soda")));
+				
+				newPriceTax.editSmallRegular(priceTax, Double.valueOf(priceTax.get("Small Regular")), Double.valueOf(textRegSmall.getText()));
+				textRegSmall.setText(String.valueOf(priceTax.get("Small Regular")));
+				
+				newPriceTax.editMediumRegular(priceTax, Double.valueOf(priceTax.get("Medium Regular")), Double.valueOf(textRegMedium.getText()));
+				textRegMedium.setText(String.valueOf(priceTax.get("Medium Regular")));
+				
+				newPriceTax.editLargeRegular(priceTax, Double.valueOf(priceTax.get("Large Regular")), Double.valueOf(textRegLarge.getText()));
+				textRegLarge.setText(String.valueOf(priceTax.get("Large Regular")));
+				
+				newPriceTax.editSmallSpecialty(priceTax, Double.valueOf(priceTax.get("Small Specialty")), Double.valueOf(textSpecSmall.getText()));
+				textSpecSmall.setText(String.valueOf(priceTax.get("Small Specialty")));
+				
+				newPriceTax.editMediumSpecialty(priceTax, Double.valueOf(priceTax.get("Medium Specialty")), Double.valueOf(textSpecMedium.getText()));
+				textSpecMedium.setText(String.valueOf(priceTax.get("Medium Specialty")));
+				
+				newPriceTax.editLargeSpecialty(priceTax, Double.valueOf(priceTax.get("Large Specialty")), Double.valueOf(textSpecLarge.getText()));
+				textSpecLarge.setText(String.valueOf(priceTax.get("Large Specialty")));
+				
+				newPriceTax.outputMap(priceTax);
+			}
+		});
 		// BEGIN NAVIGATION ACTIONS
+		btnLogOn.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+
+				
+				//TODO INDENTS
+					if(isPasswordCorrect(formattedPIN.getText().trim())) {
+						metaHand.next(frmDominosPizzaPoint.getContentPane());
+						subHand.show(subsysPanel, POSCARD);
+						btnPOS.setEnabled(false);
+						btnPrice.setEnabled(true);
+						btnAdmin.setEnabled(true);
+					}else{
+						JOptionPane.showMessageDialog(null,
+					        "Invalid PIN. Try again.",
+					        "Error Message",
+					        JOptionPane.ERROR_MESSAGE);
+					}
+
+		    	
+		        formattedPIN.setText(null);
+			}
+			
+		    private boolean isPasswordCorrect(String input) {
+		        boolean isCorrect = true;
+
+		        
+//	        	DEBUG
+	        	System.out.println(input);
+//	        	DEBUG
+		        
+	        	
+		        if(input.equals("0000")){
+		        	isCorrect = true;
+		        	lblEmployee.setText("Administrator");
+//		        	DEBUG
+		        	System.out.println("admin");
+//		        	DEBUG
+//		        }else if(input < 1000){
+//		        	isCorrect = false;
+////		        	DEBUG
+//		        	System.out.println("< 1000");
+////		        	DEBUG
+		        }else{
+		            isCorrect = map.containsKey(input);
+		            
+		            if(isCorrect) {
+			        	lblEmployee.setText(map.get(input).trim());
+		            }
+//		        	DEBUG
+		        	System.out.println(map.containsKey(input) + " : " + input);
+//		        	DEBUG
+		        }
+
+		        return isCorrect;
+		   }
+		});
+		
+		btnLogOut.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				metaHand.previous(frmDominosPizzaPoint.getContentPane());
+			}
+		});
+		
 		btnPOS.addActionListener(new ActionListener() {
+			
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				subHand.show(subsysPanel, POSCARD);
@@ -758,42 +860,238 @@ public class POS extends JPanel{
 		
 		// BEGIN POS ACTIONS
 		btnPizza.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				PizzaFrame addition = new PizzaFrame();
-			}
+		@Override
+		public void actionPerformed(ActionEvent e) {
+		PizzaFrame pizza = new PizzaFrame();
+		}
 		});
-		
+		 
 		btnSoda.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				SodaFrame addition = new PizzaFrame();
-			}
+		@Override
+		public void actionPerformed(ActionEvent e) {
+		SodaFrame soda = new SodaFrame();
+		}
 		});
 		// END POS ACTIONS
 		
-		// BEGIN ADMIN ACTIONS
-		btnAdd.addActionListener(new ActionListener() {
-			@Override
+		//Begin Admin Actions
+		btnAdd.addActionListener(new ActionListener(){
 			public void actionPerformed(ActionEvent e) {
-				// TODO Ensure EMPLOYEES is name of EmployeeList object; double-check pass by reference
-//				EmployeeFrame addition = new EmployeeFrame(employees, "", "");
+				EmployeeFrame addition = new EmployeeFrame(employees, "", "");
+			}
+		}); 
+		
+		btnEdit.addActionListener(new ActionListener(){
+			public void actionPerformed(ActionEvent e) {
+				String text = (String) listEmployeeTable.getSelectedValue();
+				String stringPin = text.substring(3, 7);
+				String stringName = text.substring(12, text.length());
+				
+				if(text.equals("   0000     Administrator")){
+					JOptionPane.showMessageDialog(null,
+			                "You cannot edit the Administrator pin.",
+			                "Error Message",
+			                JOptionPane.ERROR_MESSAGE);
+				}else{
+					EmployeeFrame edits = new EmployeeFrame(employees, stringPin, stringName);
+					
+				}
 			}
 		});
 		
-		btnEdit.addActionListener(new ActionListener() {
-			@Override
+		btnDelete.addActionListener(new ActionListener(){
 			public void actionPerformed(ActionEvent e) {
-				// TODO Fix "getPin" & "getName"
-//				EmployeeFrame edits = new EmployeeFrame(employees, getPin, getName);
+				int index = listEmployeeTable.getSelectedIndex();
+				String text = (String) listEmployeeTable.getSelectedValue();
+				if(text.equals("   0000     Administrator")){
+					JOptionPane.showMessageDialog(null,
+			                "You cannot delete the Administrator account.",
+			                "Error Message",
+			                JOptionPane.ERROR_MESSAGE);
+				}else{
+					String stringPin = text.substring(3, 7);
+					String stringName = text.substring(12, text.length()).trim();
+					employees.remove(index);
+					if(stringName.equals(lblEmployee.getText())){
+					    listEmployeeTable.setListData(employees.toArray());
+						testmap.deleteEmployee(map, stringPin);
+						testmap.outputMap(map);
+						metaHand.previous(frmDominosPizzaPoint.getContentPane());
+					}else{
+						listEmployeeTable.setListData(employees.toArray());
+						testmap.deleteEmployee(map, stringPin);
+						testmap.outputMap(map);
+					}		
+				}
 			}
 		});
-		// END ADMIN ACTIONS
 	}
 	
-//	private class ScrollReceipt extends JScrollPane {
-//		
-//	}
+	private class EmployeeFrame extends JFrame {
+
+		private JPanel contentPane;
+		private String PIN;
+		private String EmployeeName;
+
+		public EmployeeFrame(final ArrayList<String> employees, String pin, String name) {
+			this.PIN = pin;
+			this.EmployeeName = name.trim();
+			
+			setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+			setBounds(100, 100, 450, 300);
+			contentPane = new JPanel();
+			contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
+			this.setTitle("Employee");
+			this.setPreferredSize(new Dimension(450, 300));  
+			this.setResizable(false);
+			this.pack();  
+			this.setLocationRelativeTo(null); 
+			setContentPane(contentPane);
+			contentPane.setLayout(new BorderLayout(0, 0));
+			
+			JPanel confirmPanel = new JPanel();
+			confirmPanel.setPreferredSize(new Dimension(0, 60));
+			contentPane.add(confirmPanel, BorderLayout.SOUTH);
+			confirmPanel.setLayout(new BoxLayout(confirmPanel, BoxLayout.X_AXIS));
+			
+			Component horizontalGlue = Box.createHorizontalGlue();
+			confirmPanel.add(horizontalGlue);
+			
+			final JButton btnOk = new JButton("Ok");
+			btnOk.setPreferredSize(new Dimension(75, 30));
+			confirmPanel.add(btnOk);
+			
+			Component rigidArea_2 = Box.createRigidArea(new Dimension(15, 0));
+			confirmPanel.add(rigidArea_2);
+			
+			final JButton btnCancel = new JButton("Cancel");
+			btnCancel.setPreferredSize(new Dimension(75, 30));
+			confirmPanel.add(btnCancel);
+			
+			Component rigidArea_3 = Box.createRigidArea(new Dimension(25, 0));
+			confirmPanel.add(rigidArea_3);
+			
+			JPanel formPanel = new JPanel();
+			contentPane.add(formPanel, BorderLayout.CENTER);
+			formPanel.setLayout(new BoxLayout(formPanel, BoxLayout.Y_AXIS));
+			
+			Component rigidArea = Box.createRigidArea(new Dimension(0, 30));
+			formPanel.add(rigidArea);
+			
+			JLabel labelPIN = new JLabel("PIN");
+			labelPIN.setAlignmentX(Component.CENTER_ALIGNMENT);
+			labelPIN.setMaximumSize(new Dimension(216, 20));
+			formPanel.add(labelPIN);
+			
+			final JFormattedTextField textPIN = new JFormattedTextField(createFormatter("####"));
+			textPIN.setFocusLostBehavior(JFormattedTextField.COMMIT);
+			textPIN.setText(PIN);
+			textPIN.setMaximumSize(new Dimension(220, 20));
+			textPIN.setToolTipText("four-digit employee number");
+			formPanel.add(textPIN);
+			textPIN.setColumns(10);
+			
+			Component rigidArea_1 = Box.createRigidArea(new Dimension(0, 25));
+			formPanel.add(rigidArea_1);
+			
+			JLabel lblName = new JLabel("Employee Name");
+			lblName.setMaximumSize(new Dimension(216, 20));
+			lblName.setAlignmentX(Component.CENTER_ALIGNMENT);
+			formPanel.add(lblName);
+			
+			final JTextField textName = new JTextField();
+			textName.setText(EmployeeName);
+			textName.setMaximumSize(new Dimension(220, 20));
+			formPanel.add(textName);
+			textName.setColumns(10);
+			
+			btnOk.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					String replacePIN, replaceName;
+					String newName = textName.getText().trim();
+					boolean add;
+//					int checkPin = Integer.parseInt(textPIN.getText().trim());
+					
+					if(PIN == ""){
+						replacePIN = "";
+						replaceName = "";
+						add = true;
+					} else {
+						replacePIN = PIN;
+						replaceName = EmployeeName;
+						add = false;
+					}
+					
+						if(map.containsKey(textPIN.getText().trim()) 
+								&& PIN.equals(textPIN.getText().trim()) == false){
+							textPIN.setText(replacePIN);
+							JOptionPane.showMessageDialog(null,
+									"PIN already exists. Enter antoher four-digit PIN.",
+					                "Error Message",
+					                JOptionPane.ERROR_MESSAGE);
+						}else if((textPIN.getText()).equals("")){
+							JOptionPane.showMessageDialog(null,
+									"PIN field empty. Enter a four-digit PIN.",
+					                "Error Message",
+					                JOptionPane.ERROR_MESSAGE);
+						}else if((textPIN.getText()).equals("0000")){
+							textPIN.setText(replacePIN);
+							JOptionPane.showMessageDialog(null,
+									"Cannot use Administrative PIN. Enter another four-digit PIN.",
+					                "Error Message",
+					                JOptionPane.ERROR_MESSAGE);
+						}else if(textPIN.getText().trim().indexOf(" ") > -1){
+							textPIN.setText(replacePIN);
+							JOptionPane.showMessageDialog(null,
+									"Invalid PIN. Enter a four-digit PIN.",
+					                "Error Message",
+					                JOptionPane.ERROR_MESSAGE);
+						}else if(textPIN.getText().trim().length() < 4){
+							textPIN.setText(replacePIN);
+							JOptionPane.showMessageDialog(null,
+									"Invalid PIN. Enter a four-digit PIN.",
+					                "Error Message",
+					                JOptionPane.ERROR_MESSAGE);
+						}else if((textName.getText()).trim().equals("")){
+							textName.setText(replaceName);
+							JOptionPane.showMessageDialog(null,
+									"Employee name field empty. Enter the name of the employee.",
+					                "Error Message",
+					                JOptionPane.ERROR_MESSAGE);
+						}else{
+							if (add) {
+								testmap.addEmployee(map, textPIN.getText().trim(), newName);
+								employees.add("   " + textPIN.getText().trim() + "     " + newName);
+							} else {
+								if(lblEmployee.getText().equals(map.get(PIN))) {
+									lblEmployee.setText(newName);
+								}
+								
+								employees.set(employees.indexOf("   " + PIN + "     " + map.get(PIN)),
+										"   " + textPIN.getText().trim() + "     " + newName);
+								testmap.editEmployee(map, PIN, textPIN.getText().trim(), newName);
+							}
+							
+							testmap.outputMap(map);
+							listEmployeeTable.setListData(employees.toArray());
+							((JFrame) btnOk.getTopLevelAncestor()).dispose();
+						}	
+				}
+			});
+			
+			btnCancel.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					((JFrame) btnCancel.getTopLevelAncestor()).dispose();
+				}
+			});
+			
+			this.setVisible(true);
+		}
+
+	}
+
 	
 	private MaskFormatter createFormatter(String s) {
 	    MaskFormatter formatter = null;

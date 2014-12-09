@@ -3,9 +3,6 @@ import java.awt.Dimension;
 
 import javax.swing.JFrame;
 import javax.swing.JPanel;
-
-import java.awt.Color;
-
 import javax.swing.BoxLayout;
 import javax.swing.ButtonGroup;
 import javax.swing.JLabel;
@@ -28,24 +25,7 @@ import javax.swing.JButton;
 
 
 public class PizzaFrame extends JFrame {
-
 	private JPanel contentPane;
-
-//	/**
-//	 * Launch the application.
-//	 */
-//	public static void main(String[] args) {
-//		EventQueue.invokeLater(new Runnable() {
-//			public void run() {
-//				try {
-//					PizzaFrame frame = new PizzaFrame();
-//					frame.setVisible(true);
-//				} catch (Exception e) {
-//					e.printStackTrace();
-//				}
-//			}
-//		});
-//	}
 
 	public PizzaFrame() {
 		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
@@ -53,9 +33,7 @@ public class PizzaFrame extends JFrame {
 		contentPane = new JPanel();
 		this.setTitle("Create Pizza");
 		this.setPreferredSize(new Dimension(800, 425));  
-		this.setMinimumSize(this.getPreferredSize());
-		this.setMaximumSize(this.getPreferredSize());
-		this.setAlwaysOnTop(true);
+		this.setResizable(false);
 		this.pack();  
 		this.setLocationRelativeTo(null); 
 		setContentPane(contentPane);
@@ -256,9 +234,11 @@ public class PizzaFrame extends JFrame {
 		btnCancel.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				btnCancel.getParent().setEnabled(false);
+				((JFrame) btnCancel.getTopLevelAncestor()).dispose();
 			}
 		});
 		// END ACTIONS
+		
+		this.setVisible(true);
 	}
 }

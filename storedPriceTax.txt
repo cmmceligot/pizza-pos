@@ -1,0 +1,9 @@
+Large Specialty=0.0 
+Medium Specialty=0.0 
+Small Specialty=0.0 
+Small Regular=0.0 
+Large Regular=0.0 
+Tax Rate=0.0 
+Soda=1.0 
+Medium Regular=0.0 
+Toppings=0.0 
