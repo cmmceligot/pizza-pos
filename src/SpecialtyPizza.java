@@ -6,7 +6,7 @@ public class SpecialtyPizza extends Pizza{
 		if(specialtyType.equals("Hawaiian")){
 			this.toppings.add(Topping.Ham);
 			this.toppings.add(Topping.Pineapple);
-		} else if(specialtyType.equals("Meat Lovers'")){
+		}else if(specialtyType.equals("Meat Lovers'")){
 			this.toppings.add(Topping.Pepperoni);
 			this.toppings.add(Topping.Sausage);
 			this.toppings.add(Topping.Ham);
@@ -24,10 +24,12 @@ public class SpecialtyPizza extends Pizza{
 		String qty = ((Integer) this.getQuantity()).toString();
 		String total = "$" + String.format("%.2f", this.getTotal());
 		
-		switch (size) {
-		case Small: strSize = "Small";
-		case Medium: strSize = "Medium";
-		case Large: strSize = "Large";
+		if (size.equals(Size.Small)) {
+			strSize = "Small";
+		} else if (size.equals(Size.Medium)) {
+			strSize = "Medium";
+		} else {
+			strSize = "Large";
 		}
 		
 		if (this.toppings.size() == 2) {
@@ -45,14 +47,14 @@ public class SpecialtyPizza extends Pizza{
 					+ "       + Chicken\n";
 		}
 		
-		out = String.format("%3s %2s %-18s %7s %n",
-				qty, "  ", desc, total) + strTops;
+		out = String.format("%3s  %-18s %7s %n",
+				qty, desc, total) + strTops;
 		
 		return out;
 	}
 	
 	@Override
-	public void calcTotal() {
+	public void calcTotal(){
 		super.total = ((double) getQuantity()) * getPrice();
 	}
 }

@@ -1,5 +1,6 @@
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
+import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -10,11 +11,6 @@ import java.util.Iterator;
 
 public class EmployeeList {
 	static HashMap<String, String> map = new HashMap<String, String>();
-    
-	public boolean findPin(HashMap<String, String> someMap, String pin){
-		boolean findPin = someMap.containsValue(pin);
-		return findPin;
-	}
 	
 	public HashMap<String, String> addEmployee(HashMap<String, String> someMap, String pin, String name){
 		someMap.put(pin, name);
@@ -50,15 +46,30 @@ public class EmployeeList {
 	@SuppressWarnings("finally")
 	public HashMap<String, String> inputMap(){
 		try{
-			FileReader file = new FileReader("storedPins.txt");
-			BufferedReader input = new BufferedReader(file);
+			File f = new File("storedPins.txt");
 			
-			String line = "";
-	        while ((line = input.readLine()) != null) {
-	            String[] parts = line.split("=");
-	            map.put(parts[0], parts[1]);
-	        }		        
-	        input.close();
+			if(f.exists()){
+				FileReader file = new FileReader(f);
+				BufferedReader input = new BufferedReader(file);
+				
+				String line = "";
+		        while ((line = input.readLine()) != null) {
+		            String[] parts = line.split("=");
+		            map.put(parts[0], parts[1]);
+		        }
+		        input.close();
+			}else{
+				f.createNewFile();
+				FileReader file = new FileReader(f);
+				BufferedReader input = new BufferedReader(file);
+				
+				String line = "";
+		        while ((line = input.readLine()) != null) {
+		            String[] parts = line.split("=");
+		            map.put(parts[0], parts[1]);
+		        }
+		        input.close();
+			}
 		}catch(IOException ioe){
 			ioe.printStackTrace();
 	    }catch(Exception fnf){

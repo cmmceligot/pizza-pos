@@ -10,43 +10,15 @@ import java.util.ArrayList;
 
 
 public class Order{	
-    ArrayList<SalesItem> itemsOrdered = new ArrayList<SalesItem>();
-	private int orderNumber = 0;
+    static ArrayList<SalesItem> itemsOrdered = new ArrayList<SalesItem>();
+	private int orderNumber = 1;
 	private String employee = "";
 	private double subtotal = 0;
 	private double taxRate = 0;
 	private double taxAmount = 0;
 	private double grandTotal = 0;
-	
+
 	public Order() {
-	}
-	
-	public String makeReceipt() {
-		NumberFormat formatter = NumberFormat.getCurrencyInstance();
-		String out;
-		String strOrderNum = " ORDER #" + String.format("%d", orderNumber);
-		String strItems = "";
-		String strTaxRate = "Tax (" + String.format("%.2f", taxRate) + "%)";
-		String strSub = "Subtotal " + formatter.format(subtotal);
-		String strTaxAmt = " " + formatter.format(taxAmount);
-		String strTaxLine = strTaxRate + strTaxAmt;
-		String strGrand = "Grand Total " + formatter.format(grandTotal);
-		
-		for (SalesItem item : itemsOrdered) {
-			strItems += item.toString();
-		}
-		
-		out = String.format("%s%n %-30s%n%n%s%n",
-					strOrderNum, employee, " QTY  ITEM                PRICE")
-				+ strItems
-				+ String.format("%n%31s%n%31s%n%31s",
-					strSub, strTaxLine, strGrand);
-		
-		return out;
-	}
-	
-	public void storeOrderNumber() {
-		
 	}
 	
 	public void addItem(SalesItem item) {
@@ -60,17 +32,61 @@ public class Order{
 			SalesItem tmpItem = itemsOrdered.get(idx);
 			tmpItem.setQuantity(tmpItem.getQuantity() + item.getQuantity());
 			tmpItem.calcTotal();
-			this.itemsOrdered.set(idx, tmpItem);
+			itemsOrdered.set(idx, tmpItem);
 		} else {
-			this.itemsOrdered.add(item);
+			itemsOrdered.add(item);
 		}
+	}
+	
+	@SuppressWarnings("resource")
+	public String makeReceipt() {
+		NumberFormat formatter = NumberFormat.getCurrencyInstance();
+		Writer output = null;
+		
+		try{
+			File f = new File("orderNumber.txt");
+		
+			if(!f.exists()){
+				f.createNewFile();
+				FileWriter write = new FileWriter(f);
+				output = new BufferedWriter(write);
+				output.write("1");
+				orderNumber = 1;
+			} else {
+				orderNumber = Integer.valueOf(readOrderNumber());
+			}
+		} catch (Exception e){
+			e.printStackTrace();
+		}
+		
+		String out;
+		String strOrderNum = " ORDER #" + String.format("%d", orderNumber);
+		String strItems = "";
+		String strTaxRate = "Tax (" + String.format("%f", taxRate) + "%)";
+		String strSub = " " + formatter.format(subtotal);
+		String strTaxAmt = " " + formatter.format(taxAmount);;
+		String strGrand = " " + formatter.format(grandTotal);;
+		
+		for (SalesItem item : itemsOrdered) {
+			strItems += item.toString();
+			
+		}
+		
+		//System.out.println(strItems);
+		out = String.format("%s%n%-31s%n%n%s%n",
+					strOrderNum, employee, " QTY  ITEM                PRICE")
+				+ strItems
+				+ String.format("%n%20s%11s%n%20s%11s%n%20s%11s%n",
+					"Subtotal", strSub, strTaxRate, strTaxAmt, "Grand Total", strGrand);
+		
+		return out;
 	}
 	
 	public void cancelOrder(){
 		itemsOrdered.clear();
-		subtotal = 0;
-		taxAmount = 0;
-		grandTotal = 0;
+		this.subtotal = 0;
+		this.taxAmount = 0;
+		this.grandTotal = 0;
 	}
 	
 	public void setTaxRate(double tax) {
@@ -83,6 +99,7 @@ public class Order{
 				if ((item instanceof SpecialtyPizza
 						&& item.toString().regionMatches(6, x.toString(), 6, 8))
 						|| (item instanceof Pizza
+								&& ((Pizza) item).size.equals(((Pizza) x).size)
 								&& ((Pizza) item).toppings.containsAll(((Pizza) x).toppings)
 								&& ((Pizza) x).toppings.containsAll(((Pizza) item).toppings))
 						|| item instanceof Soda) {
@@ -93,9 +110,6 @@ public class Order{
 		
 		return -1;
 	}
-	
-	///////////////////////////////
-	///////////////////////////////
 	
 	@SuppressWarnings("finally")
 	public int inputOrderNumber(){
@@ -109,16 +123,10 @@ public class Order{
 				output = new BufferedWriter(write);
 				output.write("1");
 				orderNumber = 1;
-//				DEBUG
-				System.out.println("First time setup " + orderNumber);
-//				DEBUG
 			}else{
 				orderNumber = (Integer.parseInt(readOrderNumber()))+1;
 				FileWriter write = new FileWriter(f);
 				output = new BufferedWriter(write);
-//				DEBUG
-				System.out.println("Afterwards " + orderNumber);
-//				DEBUG
 				output.write(String.valueOf(orderNumber));
 			}
 		}catch(IOException ioe){
@@ -147,12 +155,16 @@ public class Order{
 			BufferedReader input = new BufferedReader(read);
 			
 			newOrderNumber = input.readLine();
+			if(newOrderNumber.equals("1000")){
+				FileWriter write = new FileWriter(f);
+				BufferedWriter output = new BufferedWriter(write);
+				output.write("1");
+				output.close();
+			}
 			
 			input.close();
 		}catch(IOException ioe){
 			ioe.printStackTrace();
-	    }catch(Exception fnf){
-	    	fnf.printStackTrace();
 	    }finally{
 	    	return newOrderNumber;
 	    }

@@ -56,20 +56,37 @@ import java.util.Iterator;
 import javax.swing.JList;
 import javax.swing.ListSelectionModel;
 
-//TODO numbers and decimal only
-
 public class POS extends JPanel{
 
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 	private JFrame frmDominosPizzaPoint;
 	static HashMap<String, String> map = new HashMap<String, String>();
 	static EmployeeList testmap = new EmployeeList();
 	static PriceTaxConfig newPriceTax = new PriceTaxConfig();
 	static HashMap<String, String> priceTax = new HashMap<String, String>();
+	
 	JList listEmployeeTable = new JList();
 	JLabel lblEmployee = new JLabel();
+	JTextArea textReceipt = new JTextArea();
+	JTextField textTax = new JTextField();
+	JTextField textToppingsPrice = new JTextField();
+	JTextField textSodaPrice = new JTextField();
+	JTextField textRegSmall = new JTextField();
+	JTextField textRegMedium = new JTextField();
+	JTextField textRegLarge = new JTextField();
+	JTextField textSpecSmall = new JTextField();
+	JTextField textSpecMedium = new JTextField();
+	JTextField textSpecLarge = new JTextField();
+	JButton btnPOS = new JButton();
+	JButton btnAdmin = new JButton();
+	JButton btnPrice = new JButton();
+	
 	Order currentOrder = new Order();
 	static NumberFormat formatter = new DecimalFormat("#0.00"); 
-	
+	static int orderNumber;
 	/**
 	 * Launch the application.
 	 */
@@ -247,19 +264,19 @@ public class POS extends JPanel{
 		lblDominosIcon1.setIcon(icon);
 		headerNav.add(lblDominosIcon1);
 		
-		final JButton btnPOS = new JButton("Point of Sales");
+		btnPOS = new JButton("Point of Sales");
 		btnPOS.setSize(dimNav);
 		btnPOS.setPreferredSize(dimNav);
 		btnPOS.setMinimumSize(dimNav);
 		btnPOS.setMaximumSize(dimNav);
 		
-		final JButton btnPrice = new JButton("Price & Rate Configuration");
+		btnPrice = new JButton("Price & Rate Configuration");
 		btnPrice.setSize(dimNav);
 		btnPrice.setPreferredSize(dimNav);
 		btnPrice.setMinimumSize(dimNav);
 		btnPrice.setMaximumSize(dimNav);
 		
-		final JButton btnAdmin = new JButton("Account Administration");
+		btnAdmin = new JButton("Account Administration");
 		btnAdmin.setSize(dimNav);
 		btnAdmin.setPreferredSize(dimNav);
 		btnAdmin.setMinimumSize(dimNav);
@@ -307,22 +324,10 @@ public class POS extends JPanel{
 		subsysPanel.add(POScard, POSCARD);
 		POScard.setLayout(new BorderLayout(0, 0));
 	
-		final JTextArea textReceipt = new JTextArea();
+		textReceipt = new JTextArea();
 		textReceipt.setColumns(30);
 		textReceipt.setEditable(true);
-		textReceipt.setText("\n"
-				+ "           ORDER #999\n"
-				+ "            Jean Doe\n\n"
-				+ " QTY  ITEM                PRICE\n"
-				+ " 100  Medium Pizza      $100.00\n"
-				+ "       + Pepperoni\n"
-				+ "       + Extra Cheese\n"
-				+ "       + Green Peppers\n\n"
-				+ "   2  2-Liter Soda      $100.00\n\n\n"
-				+ "            Subtotal $10,200.00\n"
-				+ "           Tax (20%) $Something\n"
-				+ "         Grand Total $10,200.01\n"
-				+ "\n\n\n\n\n\n\n\n\n\n\ntest");
+		textReceipt.setText("");
 		textReceipt.setCaretPosition(0);
 		textReceipt.setToolTipText("Order Receipt");
 		textReceipt.setFont(new Font("Consolas", Font.PLAIN, 22));
@@ -409,7 +414,7 @@ public class POS extends JPanel{
 		JLabel lblSodaPrice = new JLabel("Soda Price $");
 		sodaPanel.add(lblSodaPrice);
 		
-		final JTextField textSodaPrice = new JTextField();
+		textSodaPrice = new JTextField();
 		textSodaPrice.setMaximumSize(new Dimension(100, 20));
 		textSodaPrice.setText(String.valueOf(priceTax.get("Soda")));
 		textSodaPrice.setHorizontalAlignment(JTextField.RIGHT);
@@ -452,7 +457,7 @@ public class POS extends JPanel{
 		gbc_lblRegSmall.gridy = 1;
 		regPizzaPanel.add(lblRegSmall, gbc_lblRegSmall);
 		
-		final JTextField textRegSmall = new JTextField();
+		textRegSmall = new JTextField();
 		textRegSmall.setHorizontalAlignment(SwingConstants.RIGHT);
 		textRegSmall.setText(String.valueOf(priceTax.get("Small Regular")));
 		GridBagConstraints gbc_textRegSmall = new GridBagConstraints();
@@ -472,7 +477,7 @@ public class POS extends JPanel{
 		gbc_lblRegMedium.gridy = 2;
 		regPizzaPanel.add(lblRegMedium, gbc_lblRegMedium);
 		
-		final JTextField textRegMedium = new JTextField();
+		textRegMedium = new JTextField();
 		textRegMedium.setHorizontalAlignment(SwingConstants.RIGHT);
 		textRegMedium.setText(String.valueOf(priceTax.get("Medium Regular")));
 		GridBagConstraints gbc_textRegMedium = new GridBagConstraints();
@@ -491,7 +496,7 @@ public class POS extends JPanel{
 		gbc_lblRegLarge.gridy = 3;
 		regPizzaPanel.add(lblRegLarge, gbc_lblRegLarge);
 		
-		final JTextField textRegLarge = new JTextField();
+		textRegLarge = new JTextField();
 		textRegLarge.setHorizontalAlignment(SwingConstants.RIGHT);
 		textRegLarge.setText(String.valueOf(priceTax.get("Large Regular")));
 		GridBagConstraints gbc_textRegLarge = new GridBagConstraints();
@@ -535,7 +540,7 @@ public class POS extends JPanel{
 		gbc_lblSpecSmall.gridy = 1;
 		specPizzaPanel.add(lblSpecSmall, gbc_lblSpecSmall);
 		
-		final JTextField textSpecSmall = new JTextField();
+		textSpecSmall = new JTextField();
 		textSpecSmall.setHorizontalAlignment(SwingConstants.RIGHT);
 		textSpecSmall.setText(String.valueOf(priceTax.get("Small Specialty")));
 		GridBagConstraints gbc_textSpecSmall = new GridBagConstraints();
@@ -555,7 +560,7 @@ public class POS extends JPanel{
 		gbc_lblSpecMedium.gridy = 2;
 		specPizzaPanel.add(lblSpecMedium, gbc_lblSpecMedium);
 		
-		final JTextField textSpecMedium = new JTextField();
+		textSpecMedium = new JTextField();
 		textSpecMedium.setHorizontalAlignment(SwingConstants.RIGHT);
 		textSpecMedium.setText(String.valueOf(priceTax.get("Medium Specialty")));
 		GridBagConstraints gbc_textSpecMedium = new GridBagConstraints();
@@ -574,7 +579,7 @@ public class POS extends JPanel{
 		gbc_lblSpecLarge.gridy = 3;
 		specPizzaPanel.add(lblSpecLarge, gbc_lblSpecLarge);
 		
-		final JTextField textSpecLarge = new JTextField();
+		textSpecLarge = new JTextField();
 		textSpecLarge.setHorizontalAlignment(SwingConstants.RIGHT);
 		textSpecLarge.setText(String.valueOf(priceTax.get("Large Specialty")));
 		GridBagConstraints gbc_textSpecLarge = new GridBagConstraints();
@@ -596,7 +601,7 @@ public class POS extends JPanel{
 		JLabel lblToppingsPrice = new JLabel("Topping Price $");
 		toppingsPanel.add(lblToppingsPrice);
 		
-		final JTextField textToppingsPrice = new JTextField();
+		textToppingsPrice = new JTextField();
 		textToppingsPrice.setMaximumSize(new Dimension(100, 20));
 		textToppingsPrice.setText(String.valueOf(priceTax.get("Toppings")));
 		textToppingsPrice.setHorizontalAlignment(JTextField.RIGHT);
@@ -617,7 +622,7 @@ public class POS extends JPanel{
 		
 		taxPanel.add(Box.createRigidArea(new Dimension(4, 0)));
 		
-		final JTextField textTax = new JTextField();
+		textTax = new JTextField();
 		textTax.setMaximumSize(new Dimension(100, 20));
 		textTax.setText(String.valueOf(Double.valueOf(priceTax.get("Tax Rate"))));
 		textTax.setHorizontalAlignment(JTextField.RIGHT);
@@ -782,7 +787,6 @@ public class POS extends JPanel{
 		btnLogOn.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-
 				if(isPasswordCorrect(formattedPIN.getText().trim())) {
 					metaHand.next(frmDominosPizzaPoint.getContentPane());
 					subHand.show(subsysPanel, POSCARD);
@@ -795,7 +799,6 @@ public class POS extends JPanel{
 				        "Error Message",
 				        JOptionPane.ERROR_MESSAGE);
 				}
-
 		        formattedPIN.setText(null);
 			}
 			
@@ -857,6 +860,7 @@ public class POS extends JPanel{
 		// END NAVIGATION ACTIONS
 		
 		// BEGIN POS ACTIONS
+		
 		btnPizza.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
@@ -876,14 +880,23 @@ public class POS extends JPanel{
 		btnComplete.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e){
+				currentOrder.setTaxRate(Double.valueOf(textTax.getText()));
 				textReceipt.setText(currentOrder.makeReceipt());
+				currentOrder.itemsOrdered.clear();
+				currentOrder.inputOrderNumber();
+			
+				btnAdmin.setEnabled(true);
+				btnPrice.setEnabled(true);
 			}
 		});
 		
-		btnComplete.addActionListener(new ActionListener() {
+		btnCancel.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e){
+				textReceipt.setText("");
 				currentOrder.cancelOrder();
+				btnAdmin.setEnabled(true);
+				btnPrice.setEnabled(true);
 			}
 		});
 		
@@ -944,6 +957,10 @@ public class POS extends JPanel{
 	
 	private class EmployeeFrame extends JFrame {
 
+		/**
+		 * 
+		 */
+		private static final long serialVersionUID = 1L;
 		private JPanel contentPane;
 		private String PIN;
 		private String EmployeeName;
@@ -1108,6 +1125,10 @@ public class POS extends JPanel{
 
 	private class SodaFrame extends JFrame {
 	
+		/**
+		 * 
+		 */
+		private static final long serialVersionUID = 1L;
 		private JPanel contentPane;
 
 		public SodaFrame() {
@@ -1155,7 +1176,7 @@ public class POS extends JPanel{
 			Component horizontalGlue = Box.createHorizontalGlue();
 			confirmPanel.add(horizontalGlue);
 			
-			JButton btnOk = new JButton("Ok");
+			final JButton btnOk = new JButton("Ok");
 			btnOk.setFont(new Font("Lucida Grande", Font.PLAIN, 16));
 			btnOk.setPreferredSize(new Dimension(100, 30));
 			confirmPanel.add(btnOk);
@@ -1175,15 +1196,24 @@ public class POS extends JPanel{
 			btnOk.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(ActionEvent e) {
-					// TODO fix this (move things outside; up there)
 					Soda bottles = new Soda();
 					bottles.setPrice(Double.valueOf(textSodaPrice.getText()));
-					currentOrder.setTaxRate(Double.valueOf(texttax.getText()));
-					bottles.setQuantity((Integer) spinner.getValue());
-					currentOrder.addItem(bottles);
-					textReceipt.setText(currentOrder.makeReceipt());
-					
-					((JFrame) btnOk.getTopLevelAncestor()).dispose();
+					currentOrder.setTaxRate(Double.valueOf(textTax.getText()));
+					bottles.setQuantity((Integer)spinner.getValue());
+					if(bottles.getQuantity() > 100){
+						JOptionPane.showMessageDialog(null,
+								"You cannot order more than 100 sodas." + (bottles.getQuantity()),
+				                "Error Message",
+				                JOptionPane.ERROR_MESSAGE);
+					}else{
+						currentOrder.addItem(bottles);
+						textReceipt.setText(currentOrder.makeReceipt());
+						
+						btnAdmin.setEnabled(false);
+						btnPrice.setEnabled(false);
+						
+						((JFrame) btnOk.getTopLevelAncestor()).dispose();
+					}
 				}
 			});
 			
@@ -1201,6 +1231,10 @@ public class POS extends JPanel{
 	
 	private class PizzaFrame extends JFrame {
 		
+		/**
+		 * 
+		 */
+		private static final long serialVersionUID = 1L;
 		private JPanel contentPane;
 
 		public PizzaFrame() {
@@ -1208,7 +1242,7 @@ public class POS extends JPanel{
 			setBounds(100, 100, 450, 300);
 			contentPane = new JPanel();
 			this.setTitle("Create Pizza");
-			this.setPreferredSize(new Dimension(800, 425));  
+			this.setPreferredSize(new Dimension(800, 500));  
 			this.setResizable(false);
 			this.pack();  
 			this.setLocationRelativeTo(null); 
@@ -1236,7 +1270,7 @@ public class POS extends JPanel{
 			
 			Component rigidArea_6 = Box.createRigidArea(new Dimension(4, 0));
 			panel_2.add(rigidArea_6);
-			JSpinner spinnerQty = new JSpinner(qtys);
+			final JSpinner spinnerQty = new JSpinner(qtys);
 			spinnerQty.setPreferredSize(new Dimension(55, 28));
 			spinnerQty.setAlignmentY(Component.TOP_ALIGNMENT);
 			spinnerQty.setMaximumSize(new Dimension(55, 28));
@@ -1245,7 +1279,7 @@ public class POS extends JPanel{
 			Component rigidArea = Box.createRigidArea(new Dimension(45, 0));
 			panel_2.add(rigidArea);
 			
-			JComboBox comboSize = new JComboBox();
+			final JComboBox comboSize = new JComboBox();
 			comboSize.setFont(new Font("Lucida Grande", Font.PLAIN, 16));
 			comboSize.setModel(new DefaultComboBoxModel(new String[] {"Size", "Small", "Medium", "Large"}));
 			comboSize.setPreferredSize(new Dimension(110, 27));
@@ -1353,7 +1387,7 @@ public class POS extends JPanel{
 			panel_2.add(specPanel);
 			specPanel.setLayout(new BoxLayout(specPanel, BoxLayout.Y_AXIS));
 			
-			JRadioButton rdbtnSpec = new JRadioButton("Specialty Pizza");
+			final JRadioButton rdbtnSpec = new JRadioButton("Specialty Pizza");
 			rdbtnSpec.setPreferredSize(new Dimension(215, 23));
 			rdbtnSpec.setMaximumSize(new Dimension(215, 23));
 			rdbtnSpec.setFont(new Font("Lucida Grande", Font.PLAIN, 16));
@@ -1385,7 +1419,7 @@ public class POS extends JPanel{
 			Component horizontalGlue_2 = Box.createHorizontalGlue();
 			panel.add(horizontalGlue_2);
 			
-			JButton btnOk = new JButton("Ok");
+			final JButton btnOk = new JButton("Ok");
 			btnOk.setFont(new Font("Lucida Grande", Font.PLAIN, 16));
 			btnOk.setPreferredSize(new Dimension(100, 30));
 			panel.add(btnOk);
@@ -1418,8 +1452,8 @@ public class POS extends JPanel{
 					chckbxSausage.setEnabled(true);
 
 					comboSpec.setEnabled(false);
-				}
-			});
+					}
+				});
 			
 			rdbtnSpec.addActionListener(new ActionListener() {
 				@Override
@@ -1437,16 +1471,15 @@ public class POS extends JPanel{
 					chckbxSausage.setEnabled(false);
 
 					comboSpec.setEnabled(true);
-				}
-			});
-			
+					}
+				});
+				
 			btnOk.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(ActionEvent e) {
-					// TODO Implement adding a pizza
-					Pizza pie;
-					Size pieSize;
-					
+					boolean valid = true;
+					Pizza pie = new Pizza();
+					Size pieSize = Size.Small;
 					if (comboSize.getSelectedItem().toString().equals("Small")) {
 						pieSize = Size.Small;
 					} else if (comboSize.getSelectedItem().toString().equals("Medium")) {
@@ -1454,31 +1487,34 @@ public class POS extends JPanel{
 					} else if (comboSize.getSelectedItem().toString().equals("Large")) {
 						pieSize = Size.Large;
 					} else {
+						valid = false;
 						JOptionPane.showMessageDialog(null,
 								"Please select a valid pizza size.",
 				                "Error Message",
 				                JOptionPane.ERROR_MESSAGE);
 					}
-					
 					if (rdbtnSpec.isSelected()) {
 						String type = comboSpec.getSelectedItem().toString();
-						
 						if (type.equals("Specialty Type") == false) {
 							pie = new SpecialtyPizza(pieSize, type);
-							switch(pieSize) {
-							case Small: pie.setPrice(Double.valueOf(textSmallSpec.getText()));
-							case Medium: pie.setPrice(Double.valueOf(textMedSpec.getText()));
-							case Large: pie.setPrice(Double.valueOf(textLargeSpec.getText()));
+							
+							if (pieSize.equals(Size.Small)) {
+								pie.setPrice(Double.valueOf(textSpecSmall.getText()));
+							} else if (pieSize.equals(Size.Medium)) {
+								pie.setPrice(Double.valueOf(textSpecMedium.getText()));
+							} else {
+								pie.setPrice(Double.valueOf(textSpecLarge.getText()));
 							}
 						} else {
+							valid = false;
 							JOptionPane.showMessageDialog(null,
 									"Please select a valid specialty type.",
-					                "Error Message",
-					                JOptionPane.ERROR_MESSAGE);
+									"Error Message",
+									JOptionPane.ERROR_MESSAGE);
 						}
 					} else {
-						EnumSet<Topping> tops;
-						
+						EnumSet<Topping> tops = EnumSet.of(Topping.Ham);
+						tops.clear();
 						if (chckbxBacon.isSelected()) {
 							tops.add(Topping.Bacon);
 						}
@@ -1500,6 +1536,9 @@ public class POS extends JPanel{
 						if (chckbxShrooms.isSelected()) {
 							tops.add(Topping.Mushrooms);
 						}
+						if (chckbxOnions.isSelected()) {
+							tops.add(Topping.Onions);
+						}
 						if (chckbxPepperoni.isSelected()) {
 							tops.add(Topping.Pepperoni);
 						}
@@ -1509,22 +1548,35 @@ public class POS extends JPanel{
 						if (chckbxSausage.isSelected()) {
 							tops.add(Topping.Sausage);
 						}
-						
+			
 						pie = new Pizza(pieSize, tops);
-						pie.setToppingsPrice(Double.valueOf(textToppings.getText()));
+						pie.setToppingsPrice(Double.valueOf(textToppingsPrice.getText()));
 						
-						switch(pieSize) {
-						case Small: pie.setPrice(Double.valueOf(textSmallReg.getText()));
-						case Medium: pie.setPrice(Double.valueOf(textMedReg.getText()));
-						case Large: pie.setPrice(Double.valueOf(textLargeReg.getText()));
+						if (pieSize.equals(Size.Small)) {
+							pie.setPrice(Double.valueOf(textRegSmall.getText()));
+						} else if (pieSize.equals(Size.Medium)) {
+							pie.setPrice(Double.valueOf(textRegMedium.getText()));
+						} else {
+							pie.setPrice(Double.valueOf(textRegLarge.getText()));
 						}
 					}
+				
 					currentOrder.setTaxRate(Double.valueOf(textTax.getText()));
-					pie.setQuantity((Integer) spinner.getValue());
-					currentOrder.addItem(pie);
-					textReceipt.setText(currentOrder.makeReceipt());
+					pie.setQuantity((Integer) spinnerQty.getValue());
 					
-					((JFrame) btnOk.getTopLevelAncestor()).dispose();
+					if(pie.getQuantity() > 100){
+						valid = false;
+						JOptionPane.showMessageDialog(null,
+								"You cannot order more than 100 sodas.",
+				                "Error Message",
+				                JOptionPane.ERROR_MESSAGE);
+					}
+					
+					if (valid) {
+						currentOrder.addItem(pie);
+						textReceipt.setText(currentOrder.makeReceipt());
+						((JFrame) btnOk.getTopLevelAncestor()).dispose();
+					}
 				}
 			});
 			

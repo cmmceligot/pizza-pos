@@ -12,7 +12,7 @@ public abstract class SalesItem {
 		return quantity;
 	}
 	
-	public double getPrice() {
+	public double getPrice(){
 		return price;
 	}
 
@@ -20,11 +20,11 @@ public abstract class SalesItem {
 		this.price = price;
 	}
 
-	public double getTotal() {
+	public double getTotal(){
 		return total;
 	}
 
-	public void calcTotal() {
+	public void calcTotal(){
 		total = ((double) getQuantity()) * getPrice();
 	}
 	
